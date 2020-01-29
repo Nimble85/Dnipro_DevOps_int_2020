@@ -13,9 +13,9 @@ FROM centos:7
 
 MAINTAINER Kozulenko Volodymyr <fenixra73@gmail.com>
 
-# yum install deltarpm -y && \
-#    yum update -y && \
-RUN yum -y install java-1.8.0-openjdk curl  wget epel-release && \
+RUN yum install deltarpm -y && \
+    yum update -y && \
+    yum -y install java-1.8.0-openjdk curl  wget epel-release && \
     curl --silent --location http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo | tee /etc/yum.
     rpm --import https://jenkins-ci.org/redhat/jenkins-ci.org.key && \
     rpm -v --import https://jenkins-ci.org/redhat/jenkins-ci.org.key && \
@@ -26,7 +26,6 @@ EXPOSE 8080
 .
 USER jenkins
 
-#ENV USER jenkins
 
 CMD ["java", "-jar", "/usr/lib/jenkins/jenkins.war"]
 
@@ -34,7 +33,7 @@ CMD ["java", "-jar", "/usr/lib/jenkins/jenkins.war"]
 
 
 ### docker run -it  -p 8080:8080 jenkins
-![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/tack2-docker/screenshot/pic0.png  )
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task2-docker/screenshot/pic0.png  )
 
 * After this we have result
-![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/tack2-docker/screenshot/pic1.png  )
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task2-docker/screenshot/pic1.png  )
