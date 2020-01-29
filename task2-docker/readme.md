@@ -9,25 +9,24 @@
 
 ## Solution
 ### Dockerfile
-FROM centos:7
+FROM centos:7     
 
-MAINTAINER Kozulenko Volodymyr <fenixra73@gmail.com>
+MAINTAINER Kozulenko Volodymyr <fenixra73@gmail.com>     
 
-RUN yum install deltarpm -y && \
-    yum update -y && \
-    yum -y install java-1.8.0-openjdk curl  wget epel-release && \
-    curl --silent --location http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo | tee /etc/yum.
-    rpm --import https://jenkins-ci.org/redhat/jenkins-ci.org.key && \
-    rpm -v --import https://jenkins-ci.org/redhat/jenkins-ci.org.key && \
-    yum -y install jenkins
+RUN yum install deltarpm -y && \     
+    yum update -y && \    
+    yum -y install java-1.8.0-openjdk curl  wget epel-release && \      
+    curl --silent --location http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo |  tee /etc/yum.repos.d/jenkins.repo && \      
+    rpm --import https://jenkins-ci.org/redhat/jenkins-ci.org.key && \     
+    rpm -v --import https://jenkins-ci.org/redhat/jenkins-ci.org.key && \     
+    yum -y install jenkins     
 
 
-EXPOSE 8080
+EXPOSE 8080     
 .
-USER jenkins
+USER jenkins    
 
-
-CMD ["java", "-jar", "/usr/lib/jenkins/jenkins.war"]
+CMD ["java", "-jar", "/usr/lib/jenkins/jenkins.war"]     
 
 ### docker build -t jenkins .
 
