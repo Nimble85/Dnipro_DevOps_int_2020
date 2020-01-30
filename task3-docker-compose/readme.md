@@ -8,46 +8,7 @@
 # Solution
 
 ## docker-compose.yml
-version: "3"    
-services:    
-    nginx:    
-        image: nginx:1.13    
-        ports:    
-          - "80"    
-        restart: always    
-        expose:    
-          - 8081    
-        volumes:    
-          - ./nginx:/usr/share/nginx/html    
-        networks:    
-          - back-tier    
-    apache:    
-        image: httpd:2.4   
-        restart: always    
-        expose:    
-          - 8082    
-        volumes:   
-          - ./apache:/usr/local/apache2/htdocs    
-        networks:   
-          - back-tier   
-    lb:    
-        image: dockercloud/haproxy   
-        links:   
-          - nginx    
-          - apache   
-        ports:    
-          - "80:80"    
-        restart: always   
-        networks:    
-          - front-tier    
-          - back-tier    
-        volumes:    
-          - /var/run/docker.sock:/var/run/docker.sock    
-networks:     
-    front-tier:     
-        driver: bridge    
-    back-tier:   
-        driver: bridge     
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task3-docker-compose/screenshot/pic7.png  )   
 
 ## Create dirs for html files apache and nginx containers
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task3-docker-compose/screenshot/pic6.png  )
