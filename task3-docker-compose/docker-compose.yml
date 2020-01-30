@@ -7,8 +7,8 @@ services:
           - "80"
         restart: always
 
-        expose:
-          - 8081
+        ports:
+          - 8081:80
 
         volumes:
           - ./nginx:/usr/share/nginx/html
@@ -19,8 +19,8 @@ services:
         restart: always
 
 
-        expose:
-          - 8082
+        ports:
+          - 8082:80
         volumes:
           - ./apache:/usr/local/apache2/htdocs
         networks:
