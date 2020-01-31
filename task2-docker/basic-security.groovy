@@ -11,7 +11,7 @@ def instance = Jenkins.getInstance()
 
 def hudsonRealm = new HudsonPrivateSecurityRealm(false)
 
-hudsonRealm.createAccount("light","burulka")
+hudsonRealm.createAccount("adm_login","adm_pass")
 instance.setSecurityRealm(hudsonRealm)
 instance.save()
 
