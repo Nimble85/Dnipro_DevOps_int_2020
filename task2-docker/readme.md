@@ -125,6 +125,8 @@ instance.setInstallState(InstallState.INITIAL_SETUP_COMPLETED)
 ## docker build -t jenkins:3.0 .
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task2-docker/screenshot/pic2.png  )
 
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task2-docker/screenshot/pic5.png  )
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task2-docker/screenshot/pic6.png  )
 
 ## docker run -it -p 8080:8080 jenkins:3.0
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task2-docker/screenshot/pic3.png  )
