@@ -38,7 +38,7 @@ CMD ["java", "-jar", "/usr/lib/jenkins/jenkins.war"]
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task2-docker/screenshot/pic1.png  )
 
 
-## Now I try make Dockerfile v3.0 (it was litle bit complicated, only version 3.0 was susseful) 
+## Now I try make Dockerfile v3.0 (it was litle bit complicated, only version 3.0 was succeful) 
 FROM centos:7       
 RUN yum update -y && yum install -y epel-release && yum install -y git curl dpkg java java-devel unzip which && curl -s \     
 https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | bash && yum install -y git-lfs && yum clean all       
