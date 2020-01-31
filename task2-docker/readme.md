@@ -105,7 +105,7 @@ RUN /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt
 COPY basic-security.groovy $JENKINS_HOME/init.groovy.d/basic-security.groovy      
 CMD ["java", "-jar", "/usr/share/jenkins/jenkins.war"]       
 
-# For create accouunt i use script basic-security.groovy
+# For create account i use script basic-security.groovy
 #!groovy   
 import jenkins.model.*    
 import hudson.util.*;    
