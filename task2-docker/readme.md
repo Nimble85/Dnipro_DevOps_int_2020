@@ -9,6 +9,7 @@
 
 ## Solution
 ### Dockerfile v1.0
+```
 FROM centos:7     
 
 LABEL Kozulenko Volodymyr <fenixra73@gmail.com>     
@@ -27,7 +28,7 @@ EXPOSE 8080
 USER jenkins    
 
 CMD ["java", "-jar", "/usr/lib/jenkins/jenkins.war"]     
-
+```
 ### docker build -t jenkins .
 
 
@@ -39,6 +40,7 @@ CMD ["java", "-jar", "/usr/lib/jenkins/jenkins.war"]
 
 
 ## Now I try make Dockerfile v3.0 (it was litle bit complicated, only version 3.0 was succeful) 
+```
 FROM centos:7       
 RUN yum update -y && yum install -y epel-release && yum install -y git curl dpkg java java-devel unzip which && curl -s \     
 https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | bash && yum install -y git-lfs && yum clean all       
@@ -69,6 +71,7 @@ VOLUME $JENKINS_HOME
 #$REF (defaults to `/usr/share/jenkins/ref/`) contains all reference configuration we want      
 #to set on a fresh new installation. Use it to bundle additional plugins       
 #or config file with your custom jenkins Docker image.      
+ 
 RUN mkdir -p ${REF}/init.groovy.d       
 
 #jenkins version being bundled in this docker image      
@@ -104,8 +107,9 @@ RUN /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt
 #copy groovy script for disable setup wizard and create admin account      
 COPY basic-security.groovy $JENKINS_HOME/init.groovy.d/basic-security.groovy      
 CMD ["java", "-jar", "/usr/share/jenkins/jenkins.war"]       
-
+```
 # For create account i use script basic-security.groovy
+```
 #!groovy   
 import jenkins.model.*    
 import hudson.util.*;    
@@ -118,7 +122,7 @@ hudsonRealm.createAccount("light","burulka")
 instance.setSecurityRealm(hudsonRealm)     
 instance.save()    
 instance.setInstallState(InstallState.INITIAL_SETUP_COMPLETED)    
-
+```
 # All Scripts for auto install plugins , such as install-plagin.sh jenkins-support, was taken from official docker site https://github.com/jenkinsci/docker
 
 
