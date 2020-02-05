@@ -34,6 +34,11 @@ RUN mkdir -p $JENKINS_HOME \
   && groupadd -g ${gid} ${group} \
   && useradd -d "$JENKINS_HOME" -u ${uid} -g ${gid} -m -s /bin/bash ${user} \
   && usermod -aG docker jenkins
+RUN mkdir -p $JAVA_HOME/.ssh
+# COPY ./ssh/id
+
+# config git user
+RUN git config --global user.name "Volodymyr Kozulenko" && git config --global user.email fenixra73@gmail.com
 
 
 # Jenkins home directory is a volume, so configuration and build history
