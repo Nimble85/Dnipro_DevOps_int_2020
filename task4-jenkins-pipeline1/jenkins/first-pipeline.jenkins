@@ -15,7 +15,7 @@ pipeline {
         stage ("docker build") {
             steps {
                 echo "===============build image======================="
-                dir ('task4-jenkins-pipeline1') {
+                dir ('task4-jenkins-pipeline1/docker') {
                     sh 'docker build --rm -t lightlook/cent-jenk-nginx:v8.0 .'
                 }
                  
