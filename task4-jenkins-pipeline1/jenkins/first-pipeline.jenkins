@@ -12,11 +12,22 @@ pipeline {
         timestamps()
     }
     stages {
+        stage ("docker build") {
+            steps {
+                echo "===============build image======================="
+                dir ('task4-jenkins-pipeline1') {
+                    sh 'docker build --rm -t lightlook/cent-jenk-nginx:v8.0 .'
+                }
+                 
+            }
+  /*
+  
+        }
         stage("docker login") {
             steps {
                 echo " ============== docker login =================="
-                withCredentials([usernamePassword(credentialsId: 'dockerhub_semaev', usernameVariable: 'lightlook', passwordVariable: 'burulka1973')]) {
-                    sh """
+                withCredentials([usernamePassword(credentialsId: 'dockerhub_lightlook', usernameVariable: 'lightlook', passwordVariable: 'burulka1973')]) {
+                    sh """ '''
                     docker login -u $USERNAME -p $PASSWORD
                     """
                 }
@@ -38,5 +49,6 @@ pipeline {
                 '''
             }
         }
-    }
-}
+        */
+ }
+    
