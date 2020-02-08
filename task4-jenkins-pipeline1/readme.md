@@ -87,9 +87,6 @@ COPY install-plugins.sh /usr/local/bin/install-plugins.sh
 COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
 COPY run.sh /usr/local/bin/run.sh
 
-# from a derived Dockerfile, can use `RUN plugins.sh active.txt` to setup $REF/plugins from a support bundle
-#COPY plugins.sh /usr/local/bin/plugins.sh
-
 USER root
 RUN chmod +x /usr/local/bin/*.sh
 
@@ -98,8 +95,6 @@ USER ${user}
 ENTRYPOINT /usr/local/bin/run.sh
 
 RUN /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt
-
-#CMD ["java", "-jar", "-Djenkins.install.runSetupWizard=false", "/usr/share/jenkins/jenkins.war"]
 
 
 # copy groovy scripd for create user and  disable initial setup
