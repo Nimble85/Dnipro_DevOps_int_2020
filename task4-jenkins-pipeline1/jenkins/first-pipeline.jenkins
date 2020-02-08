@@ -34,30 +34,28 @@ pipeline {
         stage("check running jenkins") {
             steps {
                 echo "===============check running jenkins======================="
-                sh 'sleep 60'
+                sh 'sleep 80'
                 sh 'curl http://localhost | grep -o "Welcome to Jenkins"'
-                
-
                  
             }    
 
         }
-  /*
-        stage("docker login") {
+        stage("stop container") {
             steps {
-                echo " ============== docker login =================="
-                withCredentials([usernamePassword(credentialsId: 'dockerhub_lightlook', usernameVariable: 'lightlook', passwordVariable: 'burulka1973')]) {
+                echo "===============stop container jenkins======================="
+                sh 'docker stop cent-jenk-nginx'
+                                
+            }    
+
+        }
+  
+        stage("login to docker hub") {
+            steps {
+                echo " ============== login to docker hub =================="
+                withCredentials([usernamePassword(credentialsId: 'dockerhub_lightlook', sernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                     sh """ '''
                     docker login -u $USERNAME -p $PASSWORD
                     """
-                }
-            }
-        }
-        stage("create docker image") {
-            steps {
-                echo " ============== start building image =================="
-                dir ('docker') {
-                	sh 'docker build -t lightlook/jen-dock-nginx:v1.0  . '
                 }
             }
         }
@@ -65,7 +63,7 @@ pipeline {
             steps {
                 echo " ============== start pushing image =================="
                 sh '''
-                docker push lightlook/jen-dock-nginx:v1.0 
+                docker push lightlook/cent-jenk-nginx:v8.0 
                 '''
             }
            
@@ -73,8 +71,8 @@ pipeline {
         
       }
 
-*/
-      }
+
+    }
 }
 
     
