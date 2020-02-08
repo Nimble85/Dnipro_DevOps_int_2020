@@ -36,13 +36,9 @@ VOLUME $JENKINS_HOME
 # or config file with your custom jenkins Docker image.
 RUN mkdir -p ${REF}/init.groovy.d
 
-# jenkins version being bundled in this docker image
-ARG JENKINS_VERSION
-ENV JENKINS_VERSION ${JENKINS_VERSION:-2.99}
 
 # Can be used to customize where jenkins.war get downloaded from
 ARG JENKINS_URL=http://updates.jenkins-ci.org/download/war/2.219/jenkins.war
-#ARG JENKINS_URL=https://repo.jenkins-ci.org/public/org/jenkins-ci/main/jenkins-war/${JENKINS_VERSION}/jenkins-war-${JENKINS_VERSION}.war
 
 # could use ADD but this one does not check Last-Modified header neither does it allow to control checksum
 # see https://github.com/docker/docker/issues/8331
@@ -62,8 +58,6 @@ EXPOSE 80
 ENV COPY_REFERENCE_FILE_LOG $JENKINS_HOME/copy_reference_file.log
 
 
-
-#ENTRYPOINT   java -jar -Djenkins.install.runSetupWizard=false /opt/jenkins.war && /usr/sbin/nginx  
 RUN usermod -aG nginx jenkins
 RUN usermod -aG root jenkins
 
@@ -71,13 +65,11 @@ RUN chmod -R 766 /var/log/nginx/
 
 RUN chown -R ${user} "$JENKINS_HOME" "$REF"
 
-
-#USER ${user}
-
 COPY jenkins-support /usr/local/bin/jenkins-support
 COPY install-plugins.sh /usr/local/bin/install-plugins.sh
 COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
 COPY run.sh /usr/local/bin/run.sh
+
 # from a derived Dockerfile, can use `RUN plugins.sh active.txt` to setup $REF/plugins from a support bundle
 #COPY plugins.sh /usr/local/bin/plugins.sh
 
@@ -104,10 +96,5 @@ RUN chown nginx:nginx /etc/nginx/nginx.conf
 
 
 
-# COPY jenkins.sh /usr/local/bin/jenkins.sh
-#ENTRYPOINT ["java"]
-#CMD ["-Djenkins.install.runSetupWizard=false", "-jar", "/usr/share/jenkins/jenkins.war"]  
-
-# ENTRYPOINT  java -jar -Djenkins.install.runSetupWizard=false /usr/share/jenkins/jenkins.war && /usr/sbin/nginx  
-ENTRYPOINT /usr/sbin/nginx && java -jar -Djenkins.install.runSetupWizard=false /usr/share/jenkins/jenkins.war
-
+#ENTRYPOINT /usr/sbin/nginx && java -jar -Djenkins.install.runSetupWizard=false /usr/share/jenkins/jenkins.war
+ENTRYPOINT /usr/local/bin/run.sh
