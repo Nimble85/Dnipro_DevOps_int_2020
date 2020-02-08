@@ -48,8 +48,9 @@ pipeline {
                 docker push lightlook/jen-dock-nginx:v1.0 
                 '''
             }
+            */
         }
-        */
+        
       }
     }
     
