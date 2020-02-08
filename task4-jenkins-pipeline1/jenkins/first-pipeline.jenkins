@@ -34,7 +34,7 @@ pipeline {
         stage("check running jenkins") {
             steps {
                 echo "===============check running jenkins======================="
-                sh 'sleep 20'
+                sh 'sleep 60'
                 sh 'curl http://localhost | grep -o "Welcome to Jenkins"'
                 
 
