@@ -53,7 +53,7 @@ pipeline {
             steps {
                 echo " ============== login to docker hub =================="
                 withCredentials([usernamePassword(credentialsId: 'dockerhub_lightlook', sernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh  'docker login -u $USERNAME -p $PASSWORD'
+                    sh  docker login -u $USERNAME -p $PASSWORD
                    
                 }
             }
