@@ -31,6 +31,17 @@ pipeline {
             }    
 
         }
+        stage("check running jenkins") {
+            steps {
+                echo "===============check running jenkins======================="
+                
+                sh 'curl http://localhost | grep -o "Welcome to Jenkins"'
+                
+
+                 
+            }    
+
+        }
   /*
         stage("docker login") {
             steps {
