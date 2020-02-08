@@ -16,7 +16,7 @@ pipeline {
             steps {
                 echo "===============build image======================="
                 dir ('task4-jenkins-pipeline1/docker') {
-                    sh 'docker build --rm -t lightlook/cent-jenk-nginx:latest .'
+                    sh 'docker build --rm -t lightlook/cent-jenk-nginx:v8.0 .'
                 }
                  
             }
@@ -25,7 +25,7 @@ pipeline {
             steps {
                 echo "===============docker run container======================="
                 dir ('task4-jenkins-pipeline1/docker') {
-                    sh 'mkdir -p /opt/jenkins_home/ && docker run --rm --name cent-jenk-nginx -d -p80:80 -v /opt/jenkins_home:/var/jenkins_home  lightlook/cent-jenk-nginx:latest '
+                    sh 'mkdir -p /opt/jenkins_home/ && docker run --rm --name cent-jenk-nginx -d -p80:80 -v /opt/jenkins_home:/var/jenkins_home  lightlook/cent-jenk-nginx:v8.0 '
                 }
                  
             }    
@@ -53,7 +53,7 @@ pipeline {
             steps {
                 echo " ============== login to docker hub =================="
                 withCredentials([usernamePassword(credentialsId: 'dockerhub_lightlook', sernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh  docker login -u $USERNAME -p $PASSWORD
+                    sh  'docker login -u $USERNAME -p $PASSWORD'
                    
                 }
             }
@@ -61,7 +61,7 @@ pipeline {
         stage("docker push") {
             steps {
                 echo " ============== start pushing image =================="
-                sh   docker push lightlook/cent-jenk-nginx:latest
+                sh   'docker push lightlook/cent-jenk-nginx:v8.0'
             }
            
         }
