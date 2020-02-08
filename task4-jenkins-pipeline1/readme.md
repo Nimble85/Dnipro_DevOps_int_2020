@@ -689,5 +689,7 @@ Finished: SUCCESS
 ```
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task4-jenkins-pipeline1/screenshot/pic1.png  )
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task4-jenkins-pipeline1/screenshot/pic2.png  )
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task4-jenkins-pipeline1/screenshot/pic3.png  )
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task4-jenkins-pipeline1/screenshot/pic4.png  )
 
 
