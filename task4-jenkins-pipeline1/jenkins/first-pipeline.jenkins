@@ -12,7 +12,7 @@ pipeline {
         timestamps()
     }
     stages {
-        stage ("docker build") {
+        stage("docker build") {
             steps {
                 echo "===============build image======================="
                 dir ('task4-jenkins-pipeline1/docker') {
@@ -21,7 +21,7 @@ pipeline {
                  
             }
         }   
-        stage ("docker run") {
+        stage("docker run") {
             steps {
                 echo "===============docker run container======================="
                 dir ('task4-jenkins-pipeline1/docker') {
