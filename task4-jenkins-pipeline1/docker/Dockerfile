@@ -99,6 +99,7 @@ COPY basic-security.groovy $JENKINS_HOME/init.groovy.d/basic-security.groovy
 
 # copy  nginx config
 COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
+USER root
 RUN chown nginx:nginx /etc/nginx/nginx.conf
 
 
