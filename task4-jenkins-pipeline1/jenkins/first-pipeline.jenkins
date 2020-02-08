@@ -20,6 +20,7 @@ pipeline {
                 }
                  
             }
+        }   
         stage ("docker run") {
             steps {
                 echo "===============docker run container======================="
@@ -28,9 +29,9 @@ pipeline {
                 }
                  
             }    
-  /*
-  
+
         }
+  /*
         stage("docker login") {
             steps {
                 echo " ============== docker login =================="
@@ -56,11 +57,13 @@ pipeline {
                 docker push lightlook/jen-dock-nginx:v1.0 
                 '''
             }
-            */
+           
         }
         
       }
-    }
-    }
+
+*/
+      }
 }
+
     
