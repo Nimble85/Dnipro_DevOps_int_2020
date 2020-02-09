@@ -31,7 +31,7 @@ pipeline {
         stage("run webcalc container") {
             steps {
                 echo "===============stop container jenkins======================="
-                sh 'docker run --rm --name java-webcalc -p 8081:8080 -p 8009:8009  lightlook/java-wecalc:v1.0'
+                sh 'docker run --rm -d --name java-webcalc -p 8081:8080 -p 8009:8009  lightlook/java-wecalc:v1.0'
                                 
             }    
          }
