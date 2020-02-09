@@ -41,7 +41,8 @@ pipeline {
                 sh 'sleep 30'
                 sh '''
                     #!/bin/bash
-                    ./test.sh
+                    curl  "http://localhost:8081/api/calculator/sub?x=12&y=8" | grep -o '"result":4'
+                    ./task4-jenkins-pipeline2/test.sh
                 '''
                 echo "===============check calc passed=======================" 
             }    
