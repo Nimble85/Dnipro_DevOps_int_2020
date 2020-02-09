@@ -15,15 +15,17 @@ pipeline {
         stage("build maven app") {
             steps {
                 echo "===============build maven app======================="
+                dir ("task4-jenkins-pipeline2") {
                 sh 'mvn clean package -Dmaven.test.skip=true'
-          
+                }
             }
         }   
         stage("buil docker container with app ") {
             steps {
                 echo "===============build container calc======================="
+                dir ("task4-jenkins-pipeline2") {
                 sh 'docker build --rm -t lightlook/java-wecalc:v1.0 .'
-                                 
+                }                 
             }    
         }
         stage("run webcalc container") {
