@@ -49,11 +49,11 @@ pipeline {
             steps {
                 echo "===============check running calc======================="
                 sh 'sleep 60'
-                sh 'curl "$url1" | grep -o "$test_url1"'
-                sh 'curl "$url2" | grep -o "$test_url2"'
-                sh 'curl "$url3" | grep -o "$test_url3"'
-                sh 'curl "$url4" | grep -o "$test_url4"'
-                sh 'curl "$url5" | grep -o "$test_url5"'
+                sh 'curl "${url1}" | grep -o "${test_url1}"'
+                sh 'curl "${url2}" | grep -o "${test_url2}"'
+                sh 'curl "${url3}" | grep -o "${test_url3}"'
+                sh 'curl "${url4}" | grep -o "${test_url4}"'
+                sh 'curl "${url5}" | grep -o "${test_url5}"'
                 echo "===============check calc passed=======================" 
             }    
 
