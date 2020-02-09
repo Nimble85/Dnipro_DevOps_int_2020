@@ -10,19 +10,7 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '2', artifactNumToKeepStr: '2'))
         timestamps()
     }
-    environment {
-        url1 = "http://localhost:8081/api/calculator/ping"
-        url2 = "http://localhost:8081/api/calculator/add?x=8y=26"
-        url3 = "http://localhost:8081/api/calculator/sub?x=12&y=8"
-        url4 = "http://localhost:8081/api/calculator/mul?x=11&y=8"
-        url5 = "http://localhost:8081/api/calculator/div?x=12&y=12"
-        test_url1 = "Welcome to Java Maven Calculator Web App!!!"
-        test_url2 = ""result":34"
-        test_url3 = ""result":4"
-        test_url4 = ""result":88"
-        test_url5 = ""result":1"
-       
-    }
+  
     stages {
         stage("build maven app") {
             steps {
@@ -49,11 +37,7 @@ pipeline {
             steps {
                 echo "===============check running calc======================="
                 sh 'sleep 60'
-                sh 'curl "${url1}" | grep -o "${test_url1}"'
-                sh 'curl "${url2}" | grep -o "${test_url2}"'
-                sh 'curl "${url3}" | grep -o "${test_url3}"'
-                sh 'curl "${url4}" | grep -o "${test_url4}"'
-                sh 'curl "${url5}" | grep -o "${test_url5}"'
+                sh 'test.sh'
                 echo "===============check calc passed=======================" 
             }    
 
