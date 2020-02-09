@@ -38,7 +38,7 @@ pipeline {
         stage("test running webcalc") {
             steps {
                 echo "===============check running calc======================="
-                sh 'sleep 60'
+                sh 'sleep 30'
                 bash '''
                     #!/bin/bash
                     ./test.sh
