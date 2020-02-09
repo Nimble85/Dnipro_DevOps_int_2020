@@ -71,7 +71,11 @@ pipeline {
                 sh   'docker push lightlook/java-wecalc:v1.0'
             }
         }
+    post { 
+        failure { 
+            sh 'docker stop java-webcalc'
+        }
     }
-}
-    
+    }
+}    
 
