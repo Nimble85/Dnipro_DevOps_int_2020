@@ -40,7 +40,7 @@ pipeline {
         stage("run webcalc container") {
             steps {
                 echo "===============run container jenkins======================="
-                sh 'docker run --rm --name java-webcalc -p 8080:8080 -p 8009:8009  lightlook/java-wecalc:v1.0'
+                sh 'docker run --rm --name java-webcalc -p 8081:8080 -p 8009:8009  lightlook/java-wecalc:v1.0'
                                 
             }    
          }
@@ -48,11 +48,11 @@ pipeline {
             steps {
                 echo "===============check running calc======================="
                 sh 'sleep 60'
-                sh curl 'http://localhost:8080/api/calculator/ping' | grep -o 'Welcome to Java Maven Calculator Web App!!!'
-                sh curl 'http://localhost:8080/api/calculator/add?x=8&y=26' | grep -o '"result":34'
-                sh curl 'http://localhost:8080/api/calculator/sub?x=12&y=8' | grep -o '"result":4'
-                sh curl 'http://localhost:8080/api/calculator/mul?x=11&y=8' | grep -o '"result":88'
-                sh curl 'http://localhost:8080/api/calculator/div?x=12&y=12'| grep -o '"result":1'
+                sh curl 'http://localhost:8081/api/calculator/ping' | grep -o 'Welcome to Java Maven Calculator Web App!!!'
+                sh curl 'http://localhost:8081/api/calculator/add?x=8&y=26' | grep -o '"result":34'
+                sh curl 'http://localhost:8081/api/calculator/sub?x=12&y=8' | grep -o '"result":4'
+                sh curl 'http://localhost:8081/api/calculator/mul?x=11&y=8' | grep -o '"result":88'
+                sh curl 'http://localhost:8081/api/calculator/div?x=12&y=12'| grep -o '"result":1'
                 echo "===============check calc passed=======================" 
             }    
 
