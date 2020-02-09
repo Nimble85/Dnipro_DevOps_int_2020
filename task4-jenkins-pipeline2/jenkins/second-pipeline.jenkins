@@ -73,6 +73,7 @@ pipeline {
         }
     post { 
         failure { 
+            echo "==============stop container after failure bild==============="
             sh 'docker stop java-webcalc'
         }
     }
