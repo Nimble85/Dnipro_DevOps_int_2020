@@ -384,6 +384,8 @@ cut
 [withMaven] WARNING abort infinite build trigger loop. Please consider opening a Jira issue: Infinite loop of job triggers 
 Finished: SUCCESS
 ```
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task4-jenkins-pipeline2/screenshot/pic4.png  )
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task4-jenkins-pipeline2/screenshot/pic5.png  )
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task4-jenkins-pipeline2/screenshot/pic1.png  )
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task4-jenkins-pipeline2/screenshot/pic2.png  )
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task4-jenkins-pipeline2/screenshot/pic3.png  )
