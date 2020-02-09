@@ -1,5 +1,0 @@
-curl  http://localhost:8081/api/calculator/ping | grep -o 'Welcome to Java Maven Calculator Web App'
-curl  "http://localhost:8081/api/calculator/add?x=8&y=26" | grep -o '"result":34'
-curl  "http://localhost:8081/api/calculator/sub?x=12&y=8" | grep -o '"result":4'
-curl  "http://localhost:8081/api/calculator/mul?x=11&y=8" | grep -o '"result":88'
-curl  "http://localhost:8081/api/calculator/div?x=12&y=12"| grep -o '"result":1'
