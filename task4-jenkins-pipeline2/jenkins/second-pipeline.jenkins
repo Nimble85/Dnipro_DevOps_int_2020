@@ -1,15 +1,3 @@
-# Task
-```
-2.	Сборка и тестирование  проекта (Java, JS, etc.):
-- Собрать проект из любого Git репозитория используя.
-- Протестировать работу приоложения.
-```
-## Solution
-For base java application will be use Java WebCalc repo github
-https://github.com/maping/java-maven-calculator-web-app.git
-
-# second-pipeline.jenkins
-```
 #!groovy
 // Run docker build
 properties([disableConcurrentBuilds()])
@@ -39,7 +27,7 @@ pipeline {
         }
         stage("run webcalc container") {
             steps {
-                echo "===============run container jenkins======================="
+                echo "===============stop container jenkins======================="
                 sh 'docker run --rm --name java-webcalc -p 8080:8080 -p 8009:8009  lightlook/java-wecalc:v1.0'
                                 
             }    
@@ -47,7 +35,7 @@ pipeline {
         stage("test running webcalc") {
             steps {
                 echo "===============check running calc======================="
-                sh 'sleep 60'
+                sh 'sleep 80'
                 sh curl 'http://localhost:8080/api/calculator/ping' | grep -o 'Welcome to Java Maven Calculator Web App!!!'
                 sh curl 'http://localhost:8080/api/calculator/add?x=8&y=26' | grep -o '"result":34'
                 sh curl 'http://localhost:8080/api/calculator/sub?x=12&y=8' | grep -o '"result":4'
@@ -89,5 +77,3 @@ pipeline {
 }
 
     
-
-```
