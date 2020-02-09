@@ -30,7 +30,7 @@ pipeline {
         }
         stage("run webcalc container") {
             steps {
-                echo "===============stop container jenkins======================="
+                echo "===============run webcalc container======================="
                 sh 'docker run --rm -d --name java-webcalc -p 8081:8080 -p 8009:8009  lightlook/java-wecalc:v1.0'
                                 
             }    
@@ -39,7 +39,7 @@ pipeline {
             steps {
                 echo "===============check running calc======================="
                 sh 'sleep 30'
-                bash '''
+                sh '''
                     #!/bin/bash
                     ./test.sh
                 '''
