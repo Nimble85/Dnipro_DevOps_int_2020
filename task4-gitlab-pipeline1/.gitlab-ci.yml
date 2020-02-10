@@ -10,16 +10,15 @@ variables:
     - build
     - test
     - deploy
+  before_script:
+    - "rm -rf .git" # clearing .git folder? without this stage had failure
  
   Create image:
     stage: build
     when: manual # run only manual, without automatic run after commits
     tags: 
        - build # tags for my local gitlab_runner
-    before_script:
-       - docker info
-       - whoami
-       - "rm -rf .git" # clearing .git folder? without this stage had failure
+    
       
     script:
       - "rm -rf ~/${WORK_DIR}; mkdir -p ~/${WORK_DIR};  git init; git clone  ${REPO}; cd ${WORK_DIR}; docker build --rm -t ${NAME_IMGAGE}:${BUILD_VERSION} ."
@@ -32,8 +31,6 @@ variables:
     when: on_success  # run only if previos stage had success
     tags: 
       - test # tags for my local gitlab_runner
-    before_script: 
-      - "rm -rf .git" # clearing .git folder? without this stage had failure
     script:
       - "mkdir -p /opt/jenkins_home/ ; sleep 20;  curl http://localhost | grep -o 'Welcome to Jenkins'"
       - "docker stop ${NAME_CONTAINER}"
@@ -47,8 +44,6 @@ variables:
     when: on_success # run only if previos stage had success
     tags: 
       - deploy # tags for my local gitlab_runner
-    before_script: 
-      - "rm -rf .git"    # clearing .git folder? without this stage had failure
     script: 
       - "docker login -u ${GITHUB_USERNAME} -p ${GITHUB_PASSWORD}"
       - "docker push ${NAME_IMGAGE}:${BUILD_VERSION}"
