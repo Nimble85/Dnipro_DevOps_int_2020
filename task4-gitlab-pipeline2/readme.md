@@ -30,19 +30,17 @@ stages:
   - build
   - test
   - deploy
+before_script:
+  - "rm -rf .git" # clearing .git folder, without this stage had failure
  
 Create image:
   stage: build
   when: manual # run only manual, without automatic run after commits
   tags: 
     - build # tags for my local gitlab_runner
-  before_script:
-    - docker info
-    - whoami
-    - "rm -rf .git" # clearing .git folder, without this stage had failure
       
   script:
-    - "rm -rf ~/${WORK_DIR}; mkdir -p ~/${WORK_DIR};  git init; git clone  ${REPO}; cd ${WORK_DIR}; mvn clean package -Dmaven.test.skip=true; docker build --rm -t ${NAME_IMGAGE}:${BUILD_VERSION} ."
+    - "rm -rf ~/${WORK_DIR};  git init; git clone  ${REPO}; cd ${WORK_DIR}; mvn clean package -Dmaven.test.skip=true; docker build --rm -t ${NAME_IMGAGE}:${BUILD_VERSION} ."
     - "docker run --rm -d --name java-webcalc -p 8081:8080 -p 8009:8009 ${NAME_IMGAGE}:${BUILD_VERSION}"
     
 Test container:
@@ -51,8 +49,7 @@ Test container:
   tags: 
     - test # tags for my local gitlab_runner
   before_script: 
-    - "rm -rf .git" # clearing .git folder, without this stage had failure
-    - sleep 80
+    - sleep 80 # waiting for app
   script:
     - curl  http://localhost:8081/api/calculator/ping | grep -o 'Welcome to Java Maven Calculator Web App'
     - curl  "http://localhost:8081/api/calculator/add?x=8&y=26" | grep -o '"result":34'
@@ -66,8 +63,6 @@ Push:
   when: on_success # run only if previos stage had success
   tags: 
     - deploy # tags for my local gitlab_runner
-  before_script: 
-    - "rm -rf .git"    # clearing .git folder, without this stage had failure
   script: 
     - "docker login -u ${GITHUB_USERNAME} -p ${GITHUB_PASSWORD}"
     - "docker push ${NAME_IMGAGE}:${BUILD_VERSION}"
