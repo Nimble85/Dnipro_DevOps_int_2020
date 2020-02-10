@@ -1,52 +1,47 @@
 variables:
-    REPO: https://gitlab.com/lightlook/gitlab-ci-2.git
-    WORK_DIR: gitlab-ci-2
-    NAME_IMGAGE: lightlook/java-wecalc
-    NAME_CONTAINER: java-webcalc
-    BUILD_VERSION: latest
-   
-stages:
-  - build
-  - test
-  - deploy
+  REPO: https://gitlab.com/lightlook/gitlab-ci-2.git
+  WORK_DIR: gitlab-ci-2
+  NAME_IMGAGE: lightlook/java-wecalc
+  NAME_CONTAINER: java-webcalc
+  BUILD_VERSION: latest
  
+stages:
+- build
+- test
+- deploy
+before_script:
+- "rm -rf .git" # clearing .git folder, without this stage had failure
+
 Create image:
-  stage: build
-  when: manual # run only manual, without automatic run after commits
-  tags: 
-    - build # tags for my local gitlab_runner
-  before_script:
-    - docker info
-    - whoami
-    - "rm -rf .git" # clearing .git folder, without this stage had failure
-      
-  script:
-    - "rm -rf ~/${WORK_DIR}; mkdir -p ~/${WORK_DIR};  git init; git clone  ${REPO}; cd ${WORK_DIR}; mvn clean package -Dmaven.test.skip=true; docker build --rm -t ${NAME_IMGAGE}:${BUILD_VERSION} ."
-    - "docker run --rm -d --name java-webcalc -p 8081:8080 -p 8009:8009 ${NAME_IMGAGE}:${BUILD_VERSION}"
+stage: build
+when: manual # run only manual, without automatic run after commits
+tags: 
+  - build # tags for my local gitlab_runner
     
+script:
+  - "rm -rf ~/${WORK_DIR};  git init; git clone  ${REPO}; cd ${WORK_DIR}; mvn clean package -Dmaven.test.skip=true; docker build --rm -t ${NAME_IMGAGE}:${BUILD_VERSION} ."
+  - "docker run --rm -d --name java-webcalc -p 8081:8080 -p 8009:8009 ${NAME_IMGAGE}:${BUILD_VERSION}"
+  
 Test container:
-  stage: test
-  when: on_success  # run only if previos stage had success
-  tags: 
-    - test # tags for my local gitlab_runner
-  before_script: 
-    - "rm -rf .git" # clearing .git folder, without this stage had failure
-    - sleep 80
-  script:
-    - curl  http://localhost:8081/api/calculator/ping | grep -o 'Welcome to Java Maven Calculator Web App'
-    - curl  "http://localhost:8081/api/calculator/add?x=8&y=26" | grep -o '"result":34'
-    - curl  "http://localhost:8081/api/calculator/sub?x=12&y=8" | grep -o '"result":4'
-    - curl  "http://localhost:8081/api/calculator/mul?x=11&y=8" | grep -o '"result":88'
-    - curl  "http://localhost:8081/api/calculator/div?x=12&y=12"| grep -o '"result":1'
-    - "docker stop ${NAME_CONTAINER}" 
-  # push to docker hub
+stage: test
+when: on_success  # run only if previos stage had success
+tags: 
+  - test # tags for my local gitlab_runner
+before_script: 
+  - sleep 80 # waiting for app
+script:
+  - curl  http://localhost:8081/api/calculator/ping | grep -o 'Welcome to Java Maven Calculator Web App'
+  - curl  "http://localhost:8081/api/calculator/add?x=8&y=26" | grep -o '"result":34'
+  - curl  "http://localhost:8081/api/calculator/sub?x=12&y=8" | grep -o '"result":4'
+  - curl  "http://localhost:8081/api/calculator/mul?x=11&y=8" | grep -o '"result":88'
+  - curl  "http://localhost:8081/api/calculator/div?x=12&y=12"| grep -o '"result":1'
+  - "docker stop ${NAME_CONTAINER}" 
+# push to docker hub
 Push:  
-  stage: deploy
-  when: on_success # run only if previos stage had success
-  tags: 
-    - deploy # tags for my local gitlab_runner
-  before_script: 
-    - "rm -rf .git"    # clearing .git folder, without this stage had failure
-  script: 
-    - "docker login -u ${GITHUB_USERNAME} -p ${GITHUB_PASSWORD}"
-    - "docker push ${NAME_IMGAGE}:${BUILD_VERSION}"
+stage: deploy
+when: on_success # run only if previos stage had success
+tags: 
+  - deploy # tags for my local gitlab_runner
+script: 
+  - "docker login -u ${GITHUB_USERNAME} -p ${GITHUB_PASSWORD}"
+  - "docker push ${NAME_IMGAGE}:${BUILD_VERSION}"
