@@ -14,6 +14,9 @@
 3. Stage 2 - Test aplication for runing and arifmetic functional and stop container
 4. Stage 3 - login to dockerhub and push image
 
+# My Gitlab repositories
+https://gitlab.com/lightlook/gitlab-ci-2
+
 ## File .gitlab-ci.yml
 ```
 variables:
