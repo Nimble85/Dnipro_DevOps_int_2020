@@ -41,7 +41,7 @@ variables:
     before_script:
        - docker info
        - whoami
-       - "rm -rf .git" # clearing .git folder? without this stage had failure
+       - "rm -rf .git" # clearing .git folder, . without this stage had has failure
       
     script:
       - "rm -rf ~/${WORK_DIR}; mkdir -p ~/${WORK_DIR};  git init; git clone  ${REPO}; cd ${WORK_DIR}; docker build --rm -t ${NAME_IMGAGE}:${BUILD_VERSION} ."
@@ -53,7 +53,7 @@ variables:
     tags: 
       - test # tags for my local gitlab_runner
     before_script: 
-      - "rm -rf .git" # clearing .git folder? without this stage had failure
+      - "rm -rf .git" # clearing .git folder, without this stage had has failure
     script:
       - "mkdir -p /opt/jenkins_home/ ; sleep 20;  curl http://localhost | grep -o 'Welcome to Jenkins'"
       - "docker stop ${NAME_CONTAINER}"
@@ -65,7 +65,7 @@ variables:
     tags: 
       - deploy # tags for my local gitlab_runner
     before_script: 
-      - "rm -rf .git"    # clearing .git folder? without this stage had failure
+      - "rm -rf .git"    # clearing .git folder. without this stage had has failure
     script: 
       - "docker login -u ${GITHUB_USERNAME} -p ${GITHUB_PASSWORD}"
       - "docker push ${NAME_IMGAGE}:${BUILD_VERSION}"
