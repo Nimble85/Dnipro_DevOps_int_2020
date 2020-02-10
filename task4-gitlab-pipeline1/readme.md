@@ -15,6 +15,9 @@ Jenkins CI сервер на основе Ubuntu – стандартная ин
 3. Stage 2 - test for running Jenkins and stop container
 4. Stage 3 - login to dockerhub and push image
 
+# Gitlab repo
+https://gitlab.com/lightlook/gitlab-ci-1
+
 
 ## File .gitlab-ci.yml
 ```
