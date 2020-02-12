@@ -1,0 +1,74 @@
+image: docker
+services:
+  - docker:dind
+
+variables:
+  NAME_CONTAINER: 'java-wecalc' # name main container 
+  NAME_TEST_CONTAINER: 'alpine-curl' # name  container for run tests
+  BUILD_VERSION: 'v2.0'
+  PROJECT: 'gitlab-ci-2-v2'
+  PORT_EXT: '8080' # env external port for container
+  PORT_INT: '8080' # env internal port for container
+  NETWORK: 'test-network' # name docker network for test
+  MAVEN_OPT: '-Dmaven.test.skip=true' # option for maven build
+  PATH_ARTIFACT: 'target/calculator.war' # path to builded java app
+  TEST_API_1: '/api/calculator/ping'    # url for test
+  TEST_API_2: '/api/calculator/add?x=8&y=26' 
+  TEST_API_3: '/api/calculator/sub?x=12&y=8'
+  TEST_API_4: '/api/calculator/mul?x=11&y=8'
+  TEST_API_5: '/api/calculator/div?x=12&y=12'
+  CURL_URL_1: 'http://${NAME_CONTAINER}:${PORT_EXT}${TEST_API_1}' # gathering test url (contained name conainers, port, url)
+  CURL_URL_2: 'http://${NAME_CONTAINER}:${PORT_EXT}${TEST_API_2}'
+  CURL_URL_3: 'http://${NAME_CONTAINER}:${PORT_EXT}${TEST_API_3}'
+  CURL_URL_4: 'http://${NAME_CONTAINER}:${PORT_EXT}${TEST_API_4}'
+  CURL_URL_5: 'http://${NAME_CONTAINER}:${PORT_EXT}${TEST_API_5}'
+  NAME_IMGAGE: '${GITHUB_USERNAME}/${NAME_CONTAINER}' # name main image builded with app
+  NAME_TEST_IMAGE: '${GITHUB_USERNAME}/${NAME_TEST_CONTAINER}' # name image with curl
+  
+ 
+stages:     # Satges of pipeline
+  - mvn_build
+  - dockerize
+  - test
+
+maven:   # stage for build java app from src
+  image: opennms/maven 
+  stage: mvn_build
+  when: manual # run only manual, without automatic run after commits
+  script:
+    - "mvn clean package ${MAVEN_OPT}"
+  artifacts:    # create artifact for sending in to stage dockerize
+    paths:
+      - ${PATH_ARTIFACT}
+
+docker:  # stage  for build docker containers wit app and test tools
+  stage: dockerize
+  image: docker
+  dependencies: # use artifact created on stage mvn_build
+    - maven
+  when: manual
+    
+  script:
+    - "docker build -t ${NAME_IMGAGE}:${BUILD_VERSION} ." # put artifact WAR in docker image java app
+    - "docker build -t ${NAME_TEST_IMAGE} ./test-image" # build image alpine with curl
+    - "docker login -u ${GITHUB_USERNAME} -p ${GITHUB_PASSWORD}" # login in dockerhub
+    - "docker push ${NAME_IMGAGE}:${BUILD_VERSION}" #push builded image with java app to dockerhub
+    - "docker push ${NAME_TEST_IMAGE}" # push created test container to dockerhub
+
+test:  # stage for testing main java app
+  stage: test
+  when: manual  # run only if previos stage had success
+
+  script:
+    - "docker pull ${NAME_IMGAGE}:${BUILD_VERSION}" # pull main image from dockerhub
+    - "docker run -d --name ${NAME_CONTAINER} -p ${PORT_EXT}:${PORT_INT} ${NAME_IMGAGE}:${BUILD_VERSION}" # run main container with app
+    - "sleep 80" # waiting for app
+    - "docker network create ${NETWORK} " #create networ for test
+    - "docker network connect ${NETWORK} ${NAME_CONTAINER}" # connect main container to test network
+    - "docker run --network ${NETWORK} -a STDOUT ${NAME_TEST_IMAGE} ${CURL_URL_1}" #    run test container for testing main container
+    - "docker run --network ${NETWORK} -a STDOUT ${NAME_TEST_IMAGE} ${CURL_URL_2}" #    during start test container had connect to docker network
+    - "docker run --network ${NETWORK} -a STDOUT ${NAME_TEST_IMAGE} ${CURL_URL_3}" # 
+    - "docker run --network ${NETWORK} -a STDOUT ${NAME_TEST_IMAGE} ${CURL_URL_4}" # 
+    - "docker run --network ${NETWORK} -a STDOUT ${NAME_TEST_IMAGE} ${CURL_URL_5}" #  
+    - "docker login -u ${GITHUB_USERNAME} -p ${GITHUB_PASSWORD}"
+    - "docker push ${NAME_IMGAGE}" # push docker image  java app after pass tests to dockerhub
