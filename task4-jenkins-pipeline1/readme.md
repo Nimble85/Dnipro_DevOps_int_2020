@@ -619,54 +619,9 @@ Commit message: "fix run.sh"
 19:27:17  + docker push lightlook/cent-jenk-nginx:v8.0
 19:27:17  The push refers to repository [docker.io/lightlook/cent-jenk-nginx]
 19:27:18  51fef5b0921f: Preparing
-19:27:18  1dadfe59e3ef: Preparing
-19:27:18  3820fe4fe43e: Preparing
-19:27:18  074ee09e5ba0: Preparing
-19:27:18  5963522624dc: Preparing
-19:27:18  ae1f44c4d432: Preparing
-19:27:18  eca82ec7978e: Preparing
-19:27:18  df4bca35d4bc: Preparing
-19:27:18  b824a22215ae: Preparing
-19:27:18  368efb24d55e: Preparing
-19:27:18  a62f025ffdd2: Preparing
-19:27:18  4d82ea305b38: Preparing
-19:27:18  e40453b0f415: Preparing
-19:27:18  58234d278c67: Preparing
-19:27:18  368efb24d55e: Preparing
-19:27:18  a3997573b85a: Preparing
-19:27:18  e66e1c99431b: Preparing
-19:27:18  70ecf886217e: Preparing
-19:27:18  61f6fa70e6b5: Preparing
-19:27:18  33f4515dbf67: Preparing
-19:27:18  77b174a6a187: Preparing
-19:27:18  ae1f44c4d432: Waiting
-19:27:18  eca82ec7978e: Waiting
-19:27:18  df4bca35d4bc: Waiting
-19:27:18  b824a22215ae: Waiting
-19:27:18  368efb24d55e: Waiting
-19:27:18  a62f025ffdd2: Waiting
-19:27:18  4d82ea305b38: Waiting
-19:27:18  e40453b0f415: Waiting
-19:27:18  58234d278c67: Waiting
-19:27:18  a3997573b85a: Waiting
-19:27:18  e66e1c99431b: Waiting
-19:27:18  70ecf886217e: Waiting
-19:27:18  77b174a6a187: Waiting
-19:27:18  33f4515dbf67: Waiting
-19:27:18  61f6fa70e6b5: Waiting
-19:27:23  5963522624dc: Pushed
-19:27:23  51fef5b0921f: Pushed
-19:27:23  3820fe4fe43e: Pushed
-19:27:23  1dadfe59e3ef: Pushed
-19:27:26  eca82ec7978e: Pushed
-19:27:26  ae1f44c4d432: Pushed
-19:27:27  df4bca35d4bc: Pushed
-19:27:27  a62f025ffdd2: Layer already exists
-19:27:27  b824a22215ae: Pushed
-19:27:30  4d82ea305b38: Pushed
-19:27:30  368efb24d55e: Pushed
-19:27:31  e40453b0f415: Pushed
-19:27:31  58234d278c67: Pushed
+---
+cut
+---
 19:27:32  e66e1c99431b: Layer already exists
 19:27:32  70ecf886217e: Layer already exists
 19:27:32  61f6fa70e6b5: Layer already exists
