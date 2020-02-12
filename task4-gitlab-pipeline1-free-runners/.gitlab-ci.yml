@@ -1,0 +1,59 @@
+image: docker
+services:
+  - docker:dind
+
+variables:
+  NAME_CONTAINER: 'cent-jenk-nginx' # name main container 
+  NAME_TEST_CONTAINER: 'alpine-curl' # name  container for run tests
+  BUILD_VERSION: 'v9.0'
+  PROJECT: 'gitlab-ci-1-v2'
+  PORT_EXT: '80'
+  PORT_INT: '80'
+  CURL_URL: 'http://${NAME_CONTAINER}'
+  NETWORK: 'test-network'
+#  COMMA: \'
+# TEST_DEFIN: 'Welcome to Jenkins'
+  JENKINS_HOME: '/var/jenkins_home'
+#  TEST_METHOD: 'grep -o ${TEST_DEFIN}'
+  NAME_IMGAGE: '${GITHUB_USERNAME}/${NAME_CONTAINER}'
+  NAME_TEST_IMAGE: '${GITHUB_USERNAME}/${NAME_TEST_CONTAINER}'
+  FOLDER_HOST: '/builds/lightlook/${PROJECT}/jenkins_home' # folder on host for storing jenkins_home
+ 
+stages:
+  - build
+  - test
+  - deploy
+
+Create image:
+  stage: build
+  when: manual
+     
+  script:
+    - "docker build -t ${NAME_IMGAGE}:${BUILD_VERSION} ." # build main image 
+    - "docker build -t ${NAME_TEST_IMAGE} ./test-image" # build image alpine with curl
+    - "docker login -u ${GITHUB_USERNAME} -p ${GITHUB_PASSWORD}"
+    - "docker push ${NAME_IMGAGE}:${BUILD_VERSION}"
+    - "docker push ${NAME_TEST_IMAGE}"
+ 
+Test container:
+  stage: test
+  when: manual
+
+  script:
+    - "docker pull ${NAME_IMGAGE}:${BUILD_VERSION}"
+    - "docker pull ${NAME_TEST_IMAGE}"
+    - "mkdir -p ${FOLDER_HOST}; docker run  --name ${NAME_CONTAINER} -d -p ${PORT_EXT}:${PORT_INT} -v ${FOLDER_HOST}:${JENKINS_HOME}  ${NAME_IMGAGE}:${BUILD_VERSION}"
+    - "docker network create ${NETWORK} " #create networ for test
+    - "docker network connect ${NETWORK} ${NAME_CONTAINER}" # connect main container to test network
+    - "sleep 30"
+    - "docker run --network ${NETWORK} ${NAME_TEST_IMAGE} ${CURL_URL} "  # | ${TEST_METHOD} run test container for testing main container
+
+Push:
+  stage: deploy
+  when: manual
+ 
+  script: 
+    - "docker pull ${NAME_IMGAGE}:${BUILD_VERSION}"
+    - "docker login -u ${GITHUB_USERNAME} -p ${GITHUB_PASSWORD}"
+    - "docker push ${NAME_IMGAGE}"
+   
