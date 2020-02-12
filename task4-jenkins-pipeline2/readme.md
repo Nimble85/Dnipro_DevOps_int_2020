@@ -28,17 +28,35 @@ pipeline {
     agent { 
         label 'master'
         }
+    environment { 
+        MAVEN_OPT      = '-Dmaven.test.skip=true'
+        NAME_CONTAINER = 'java-wecalc'
+        BUILD_NO       = 'v1.0'
+        PORT_EXT       = '8081'
+        PORT_INT       = '8080'
+        NAME_IMAGE     = 'lightlook/${NAME_CONTAINER}'
+        HOST           = 'http://localhost'
+        TEST_URL1      = '/api/calculator/ping' 
+        TEST_URL2      = '/api/calculator/add?x=8&y=26' 
+        TEST_URL3      = '/api/calculator/sub?x=12&y=8' 
+        TEST_URL4      = '/api/calculator/mul?x=11&y=8' 
+        TEST_URL5      = '/api/calculator/div?x=12&y=12'
+        TEST1          = 'grep -o 'Welcome to Java Maven Calculator Web App''
+        TEST2          = 'grep -o '"result":34''
+        TEST3          = 'grep -o '"result":4''
+        TEST4          = 'grep -o '"result":88''
+        TEST5          = 'grep -o '"result":1''
+    }
     options {
         buildDiscarder(logRotator(numToKeepStr: '2', artifactNumToKeepStr: '2'))
         timestamps()
     }
-  
     stages {
         stage("build maven app") {
             steps {
                 echo "===============build maven app======================="
                 dir ("task4-jenkins-pipeline2") {
-                sh 'mvn clean package -Dmaven.test.skip=true'
+                sh 'mvn clean package "${MAVEN_OPT}"'
                 }
             }
         }   
@@ -46,14 +64,14 @@ pipeline {
             steps {
                 echo "===============build container calc======================="
                 dir ("task4-jenkins-pipeline2") {
-                sh 'docker build --rm -t lightlook/java-wecalc:v1.0 .'
+                sh 'docker build --rm -t "${NAME_IMAGE}:${BUILD_NO}" .'
                 }                 
             }    
         }
         stage("run webcalc container") {
             steps {
                 echo "===============run webcalc container======================="
-                sh 'docker run --rm -d --name java-webcalc -p 8081:8080 -p 8009:8009  lightlook/java-wecalc:v1.0'
+                sh 'docker run --rm -d --name "${NAME_CONTAINER}" -p "${PORT_EXT}:${PORT_INT}"   "${NAME_IMAGE}:${BUILD_NO}"'
                                 
             }    
          }
@@ -63,22 +81,20 @@ pipeline {
                 sh 'sleep 30'
                 sh '''
                     #!/bin/bash
-                    curl  http://localhost:8081/api/calculator/ping | grep -o 'Welcome to Java Maven Calculator Web App'
-                    curl  "http://localhost:8081/api/calculator/add?x=8&y=26" | grep -o '"result":34'
-                    curl  "http://localhost:8081/api/calculator/sub?x=12&y=8" | grep -o '"result":4'
-                    curl  "http://localhost:8081/api/calculator/mul?x=11&y=8" | grep -o '"result":88'
-                    curl  "http://localhost:8081/api/calculator/div?x=12&y=12"| grep -o '"result":1'
+                    curl  "${HOST}:${PORT_EXT}${TEST_URL1}" | "${TEST1}"
+                    curl  "${HOST}:${PORT_EXT}${TEST_URL2}" | "${TEST2}"
+                    curl  "${HOST}:${PORT_EXT}${TEST_URL3}" | "${TEST3}"
+                    curl  "${HOST}:${PORT_EXT}${TEST_URL4}" | "${TEST4}"
+                    curl  "${HOST}:${PORT_EXT}${TEST_URL5}" | "${TEST5}"
 
                 '''
                 echo "===============check calc passed=======================" 
             }    
-
         }
-       
         stage("stop container") {
             steps {
                 echo "===============stop container jenkins======================="
-                sh 'docker stop java-webcalc'
+                sh 'docker stop "${NAME_CONTAINER}"'
                                 
             }    
          }
@@ -94,18 +110,21 @@ pipeline {
         stage("docker push") {
             steps {
                 echo " ============== start pushing image =================="
-                sh   'docker push lightlook/java-wecalc:v1.0'
+                sh   '''
+                 docker push "${NAME_IMAGE}"
+                 docker push "${NAME_IMAGE}:${BUILD_NO}"
+
+                '''
             }
         }
     }    
     post { 
         failure { 
-            echo "==============stop container after failure build==============="
-            sh 'docker stop java-webcalc'
+            echo "==============stop container after failure bild==============="
+            sh 'docker stop "${NAME_CONTAINER}"'
         }
     }
-    
-}    
+}     
     
 
 ```
