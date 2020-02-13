@@ -36,7 +36,14 @@ pipeline {
             steps {
                 echo "===============build maven app======================="
                 dir ("task4-jenkins-pipeline2") {
-                sh 'mvn clean package $MAVEN_OPT'
+                sh '''
+                  echo "test1 = $TEST1"
+                  echo "test2 = $TEST2"
+                  echo "test3 = $TEST3"
+                  echo "test4 = $TEST4"
+                  echo "test5 = $TEST5"
+                  mvn clean package $MAVEN_OPT
+                  '''
                 }
             }
         }   
