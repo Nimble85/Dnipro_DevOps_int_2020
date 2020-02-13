@@ -15,7 +15,6 @@ pipeline {
         HOST           = 'http://localhost'
         HOST_FOLDER    = '/opt/jenkins_home/'
         JENKINS_HOME   = '/var/jenkins_home'
-       
     }
     options {
         buildDiscarder(logRotator(numToKeepStr: '2', artifactNumToKeepStr: '2'))
@@ -28,7 +27,6 @@ pipeline {
                 dir ('task4-jenkins-pipeline1/docker') {
                     sh 'docker build --rm -t "${NAME_IMAGE}:${BUILD_NO}" .'
                 }
-                 
             }
         }   
         stage("docker run") {
@@ -40,9 +38,7 @@ pipeline {
                     docker run --rm --name "${NAME_CONTAINER}" -d -p ${PORT_EXT}:${PORT_INT} -v "${HOST_FOLDER}:${JENKINS_HOME}"  "${NAME_IMAGE}:${BUILD_NO}" 
                     '''
                 }
-                 
             }    
-
         }
         stage("check running jenkins") {
             steps {
@@ -51,19 +47,14 @@ pipeline {
                    sleep 80
                    curl http://localhost | grep -o "Welcome to Jenkins"
                 '''                   
-                 
-            }    
-
+             }    
         }
         stage("stop container") {
             steps {
                 echo "===============stop container jenkins======================="
                 sh 'docker stop "${NAME_CONTAINER}"'
-                                
             }    
-
         }
-  
         stage("login to docker hub") {
             steps {
                 echo " ============== login to docker hub =================="
@@ -81,13 +72,8 @@ pipeline {
                 docker push "${NAME_IMAGE}:${BUILD_NO}"
                 '''
             }
-           
         }
-        
-      }
-
-
-   
+    }
 }
 
     
