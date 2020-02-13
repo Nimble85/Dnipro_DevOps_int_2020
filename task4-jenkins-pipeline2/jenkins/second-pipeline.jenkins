@@ -36,7 +36,7 @@ pipeline {
             steps {
                 echo "===============build maven app======================="
                 dir ("task4-jenkins-pipeline2") {
-                sh 'mvn clean package "${MAVEN_OPT}"'
+                sh 'mvn clean package $MAVEN_OPT'
                 }
             }
         }   
@@ -44,14 +44,14 @@ pipeline {
             steps {
                 echo "===============build container calc======================="
                 dir ("task4-jenkins-pipeline2") {
-                sh 'docker build --rm -t "${NAME_IMAGE}:${BUILD_NO}" .'
+                sh 'docker build --rm -t $NAME_IMAGE:$BUILD_NO .'
                 }                 
             }    
         }
         stage("run webcalc container") {
             steps {
                 echo "===============run webcalc container======================="
-                sh 'docker run --rm -d --name "${NAME_CONTAINER}" -p "${PORT_EXT}:${PORT_INT}"   "${NAME_IMAGE}:${BUILD_NO}"'
+                sh 'docker run --rm -d --name $NAME_CONTAINER -p $PORT_EXT:$PORT_INT   $NAME_IMAGE:$BUILD_NO'
                                 
             }    
          }
@@ -61,11 +61,11 @@ pipeline {
                 sh 'sleep 30'
                 sh '''
                     #!/bin/bash
-                    curl  "${HOST}:${PORT_EXT}${TEST_URL1}" | "${TEST1}"
-                    curl  "${HOST}:${PORT_EXT}${TEST_URL2}" | "${TEST2}"
-                    curl  "${HOST}:${PORT_EXT}${TEST_URL3}" | "${TEST3}"
-                    curl  "${HOST}:${PORT_EXT}${TEST_URL4}" | "${TEST4}"
-                    curl  "${HOST}:${PORT_EXT}${TEST_URL5}" | "${TEST5}"
+                    curl  $HOST:$PORT_EXT$TEST_URL1 | $TEST1
+                    curl  $HOST:$PORT_EXT$TEST_URL2 | $TEST2
+                    curl  $HOST:$PORT_EXT$TEST_URL3 | $TEST3
+                    curl  $HOST:$PORT_EXT$TEST_URL4 | $TEST4
+                    curl  $HOST:$PORT_EXT$TEST_URL5 | $TEST5
 
                 '''
                 echo "===============check calc passed=======================" 
@@ -76,7 +76,7 @@ pipeline {
         stage("stop container") {
             steps {
                 echo "===============stop container jenkins======================="
-                sh 'docker stop "${NAME_CONTAINER}"'
+                sh 'docker stop $NAME_CONTAINER'
                                 
             }    
          }
@@ -93,8 +93,8 @@ pipeline {
             steps {
                 echo " ============== start pushing image =================="
                 sh   '''
-                 docker push "${NAME_IMAGE}"
-                 docker push "${NAME_IMAGE}:${BUILD_NO}"
+                 docker push $NAME_IMAGE
+                 docker push $NAME_IMAGE:$BUILD_NO
 
                 '''
             }
@@ -103,7 +103,7 @@ pipeline {
     post { 
         failure { 
             echo "==============stop container after failure bild==============="
-            sh 'docker stop "${NAME_CONTAINER}"'
+            sh 'docker stop $NAME_CONTAINER'
         }
     }
     
