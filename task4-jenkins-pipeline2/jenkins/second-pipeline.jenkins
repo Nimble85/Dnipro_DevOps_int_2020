@@ -19,7 +19,7 @@ pipeline {
         TEST_URL3      = '/api/calculator/sub?x=12&y=8' 
         TEST_URL4      = '/api/calculator/mul?x=11&y=8' 
         TEST_URL5      = '/api/calculator/div?x=12&y=12'
-        TEST1          = "grep -o \'Welcome to Java Maven Calculator Web App\'"
+        TEST1          = grep -o 'Welcome to Java Maven Calculator Web App'
         TEST2          = "grep -o \'\"result\":34\'"
         TEST3          = "grep -o \'\"result\":4\'"
         TEST4          = "grep -o \'\"result\":88\'"
