@@ -34,18 +34,15 @@ pipeline {
         BUILD_NO       = 'v1.0'
         PORT_EXT       = '8081'
         PORT_INT       = '8080'
-        NAME_IMAGE     = 'lightlook/${NAME_CONTAINER}'
+        NAME_IMAGE     = 'lightlook/java-wecalc'
         HOST           = 'http://localhost'
-        TEST_URL1      = '/api/calculator/ping' 
-        TEST_URL2      = '/api/calculator/add?x=8&y=26' 
-        TEST_URL3      = '/api/calculator/sub?x=12&y=8' 
-        TEST_URL4      = '/api/calculator/mul?x=11&y=8' 
-        TEST_URL5      = '/api/calculator/div?x=12&y=12'
-        TEST1          = 'grep -o 'Welcome to Java Maven Calculator Web App''
-        TEST2          = 'grep -o '"result":34''
-        TEST3          = 'grep -o '"result":4''
-        TEST4          = 'grep -o '"result":88''
-        TEST5          = 'grep -o '"result":1''
+        TEST_URL      = '/api/calculator' 
+        TEST1          = 'Calculator' 
+        TEST2          = '34'
+        TEST3          = '4'
+        TEST4          = '88' 
+        TEST5          = '1'
+     
     }
     options {
         buildDiscarder(logRotator(numToKeepStr: '2', artifactNumToKeepStr: '2'))
@@ -56,7 +53,14 @@ pipeline {
             steps {
                 echo "===============build maven app======================="
                 dir ("task4-jenkins-pipeline2") {
-                sh 'mvn clean package "${MAVEN_OPT}"'
+                sh '''
+                  echo "test1 = $TEST1"
+                  echo "test2 = $TEST2"
+                  echo "test3 = $TEST3"
+                  echo "test4 = $TEST4"
+                  echo "test5 = $TEST5"
+                  mvn clean package $MAVEN_OPT
+                  '''
                 }
             }
         }   
@@ -64,15 +68,14 @@ pipeline {
             steps {
                 echo "===============build container calc======================="
                 dir ("task4-jenkins-pipeline2") {
-                sh 'docker build --rm -t "${NAME_IMAGE}:${BUILD_NO}" .'
+                sh 'docker build --rm -t $NAME_IMAGE:$BUILD_NO .'
                 }                 
             }    
         }
         stage("run webcalc container") {
             steps {
                 echo "===============run webcalc container======================="
-                sh 'docker run --rm -d --name "${NAME_CONTAINER}" -p "${PORT_EXT}:${PORT_INT}"   "${NAME_IMAGE}:${BUILD_NO}"'
-                                
+                sh 'docker run --rm -d --name $NAME_CONTAINER -p $PORT_EXT:$PORT_INT   $NAME_IMAGE:$BUILD_NO'
             }    
          }
         stage("test running webcalc") {
@@ -81,21 +84,20 @@ pipeline {
                 sh 'sleep 30'
                 sh '''
                     #!/bin/bash
-                    curl  "${HOST}:${PORT_EXT}${TEST_URL1}" | "${TEST1}"
-                    curl  "${HOST}:${PORT_EXT}${TEST_URL2}" | "${TEST2}"
-                    curl  "${HOST}:${PORT_EXT}${TEST_URL3}" | "${TEST3}"
-                    curl  "${HOST}:${PORT_EXT}${TEST_URL4}" | "${TEST4}"
-                    curl  "${HOST}:${PORT_EXT}${TEST_URL5}" | "${TEST5}"
+                    curl  $HOST:$PORT_EXT$TEST_URL/ping | grep -o $TEST1
+                    curl  $HOST:$PORT_EXT$TEST_URL'/add?x=8&y=26' | grep -o '"result":'$TEST2
+                    curl  $HOST:$PORT_EXT$TEST_URL'/sub?x=12&y=8' | grep -o '"result":'$TEST3
+                    curl  $HOST:$PORT_EXT$TEST_URL'/mul?x=11&y=8' | grep -o '"result":'$TEST4
+                    curl  $HOST:$PORT_EXT$TEST_URL'/div?x=12&y=12' | grep -o '"result":'$TEST5
 
                 '''
                 echo "===============check calc passed=======================" 
             }    
         }
-        stage("stop container") {
+         stage("stop container") {
             steps {
                 echo "===============stop container jenkins======================="
-                sh 'docker stop "${NAME_CONTAINER}"'
-                                
+                sh 'docker stop $NAME_CONTAINER'
             }    
          }
         stage("login to docker hub") {
@@ -103,17 +105,15 @@ pipeline {
                 echo " ============== login to docker hub =================="
                 withCredentials([usernamePassword(credentialsId: 'dockerhub_lightlook', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                     sh 'docker login -u "$USERNAME" -p "$PASSWORD"'
-                                   
-                }
+                 }
             }
         }
         stage("docker push") {
             steps {
                 echo " ============== start pushing image =================="
                 sh   '''
-                 docker push "${NAME_IMAGE}"
-                 docker push "${NAME_IMAGE}:${BUILD_NO}"
-
+                 docker push $NAME_IMAGE
+                 docker push $NAME_IMAGE:$BUILD_NO
                 '''
             }
         }
@@ -121,11 +121,11 @@ pipeline {
     post { 
         failure { 
             echo "==============stop container after failure bild==============="
-            sh 'docker stop "${NAME_CONTAINER}"'
+            sh 'docker stop $NAME_CONTAINER'
         }
     }
-}     
-    
+ }    
+  
 
 ```
 
