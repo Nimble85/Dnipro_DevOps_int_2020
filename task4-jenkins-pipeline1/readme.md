@@ -123,7 +123,16 @@ pipeline {
     agent { 
         label 'master'
         }
-    triggers { pollSCM('* * * * *') }
+    environment { 
+        NAME_CONTAINER = 'cent-jenk-nginx'
+        BUILD_NO       = 'v8.0'
+        PORT_EXT       = '80'
+        PORT_INT       = '80'
+        NAME_IMAGE     = 'lightlook/${NAME_CONTAINER}'
+        HOST           = 'http://localhost'
+        HOST_FOLDER    = '/opt/jenkins_home'
+        JENKINS_HOME   = '/var/jenkins_home'
+    }
     options {
         buildDiscarder(logRotator(numToKeepStr: '2', artifactNumToKeepStr: '2'))
         timestamps()
@@ -133,46 +142,55 @@ pipeline {
             steps {
                 echo "===============build image======================="
                 dir ('task4-jenkins-pipeline1/docker') {
-                    sh 'docker build --rm -t lightlook/cent-jenk-nginx:v8.0 .'
+                    sh 'docker build --rm -t "${NAME_IMAGE}:${BUILD_NO}" .'
                 }
-             }
+            }
         }   
         stage("docker run") {
             steps {
                 echo "===============docker run container======================="
                 dir ('task4-jenkins-pipeline1/docker') {
-                    sh 'mkdir -p /opt/jenkins_home/ && docker run --rm --name cent-jenk-nginx -d -p80:80 -v /opt/jenkins_home:/var/jenkins_home  lightlook/cent-jenk-nginx:v8.0 '
+                    sh '''
+                    mkdir -p "${HOST_FOLDER}" 
+                    docker run --rm --name "${NAME_CONTAINER}" -d -p ${PORT_EXT}:${PORT_INT} -v "${HOST_FOLDER}:${JENKINS_HOME}"  "${NAME_IMAGE}:${BUILD_NO}" 
+                    '''
                 }
-             }    
+            }    
         }
         stage("check running jenkins") {
             steps {
                 echo "===============check running jenkins======================="
-                sh 'sleep 80'
-                sh 'curl http://localhost | grep -o "Welcome to Jenkins"'
+                sh '''
+                   sleep 80
+                   curl http://localhost | grep -o "Welcome to Jenkins"
+                '''                   
              }    
         }
         stage("stop container") {
             steps {
                 echo "===============stop container jenkins======================="
-                sh 'docker stop cent-jenk-nginx'
-             }    
+                sh 'docker stop "${NAME_CONTAINER}"'
+            }    
         }
         stage("login to docker hub") {
             steps {
                 echo " ============== login to docker hub =================="
                 withCredentials([usernamePassword(credentialsId: 'dockerhub_lightlook', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                     sh 'docker login -u "$USERNAME" -p "$PASSWORD"'
+                                   
                 }
             }
         }
         stage("docker push") {
             steps {
                 echo " ============== start pushing image =================="
-                sh   'docker push lightlook/cent-jenk-nginx:v8.0'
+                sh   '''
+                docker push "${NAME_IMAGE}
+                docker push "${NAME_IMAGE}:${BUILD_NO}"
+                '''
             }
-         }
-       }
+        }
+    }
 }
 
 ```
