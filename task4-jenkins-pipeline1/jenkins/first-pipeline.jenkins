@@ -11,7 +11,7 @@ pipeline {
         BUILD_NO       = 'v8.0'
         PORT_EXT       = '80'
         PORT_INT       = '80'
-        NAME_IMAGE     = 'lightlook/$NAME_CONTAINER}'
+        NAME_IMAGE     = 'lightlook/"$NAME_CONTAINER"'
         HOST           = 'http://localhost'
         HOST_FOLDER    = '/opt/jenkins_home/'
         JENKINS_HOME   = '/var/jenkins_home'
@@ -35,7 +35,7 @@ pipeline {
                 dir ('task4-jenkins-pipeline1/docker') {
                     sh '''
                     mkdir -p "$HOST_FOLDER" 
-                    docker run --rm --name "$NAME_CONTAINER}" -d -p $PORT_EXT:$PORT_INT -v "$HOST_FOLDER:$JENKINS_HOME"  "$NAME_IMAGE:$BUILD_NO" 
+                    docker run --rm --name "$NAME_CONTAINER" -d -p "$PORT_EXT:$PORT_INT" -v "$HOST_FOLDER:$JENKINS_HOME"  "$NAME_IMAGE:$BUILD_NO" 
                     '''
                 }
             }    
