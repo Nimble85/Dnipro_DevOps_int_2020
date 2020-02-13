@@ -12,7 +12,7 @@ pipeline {
         BUILD_NO       = 'v1.0'
         PORT_EXT       = '8081'
         PORT_INT       = '8080'
-        NAME_IMAGE     = 'lightlook/${NAME_CONTAINER}'
+        NAME_IMAGE     = 'lightlook/java-wecalc'
         HOST           = 'http://localhost'
         TEST_URL1      = '/api/calculator/ping' 
         TEST_URL2      = '/api/calculator/add?x=8&y=26' 
