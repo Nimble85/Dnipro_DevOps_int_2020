@@ -13,7 +13,7 @@ pipeline {
         PORT_INT       = '80'
         NAME_IMAGE     = 'lightlook/cent-jenk-nginx'
         HOST           = 'http://localhost'
-        HOST_FOLDER    = '/opt/jenkins_home/'
+        HOST_FOLDER    = '/opt/jenkins_home'
         JENKINS_HOME   = '/var/jenkins_home'
     }
     options {
