@@ -2,7 +2,7 @@
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task5-ansible-v2/screenshot/pic1.png  )
 
 ## Solution
-
+```
 Steps:
   1. Apply role lb_haproxy
      a. install haproxy 
@@ -23,7 +23,7 @@ Steps:
      3.3 Copy database dump file
      3.4 Restore database
      3.5 Create database user
-
+```
 ### haproxy.cfg.j2 
 
 ```
