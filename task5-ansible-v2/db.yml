@@ -1,0 +1,10 @@
+---
+
+- name: apply roles for databases
+  hosts: DB
+  become: yes
+
+
+  roles:
+  - { role: base_db, when: ansible_system == 'Linux' }
+

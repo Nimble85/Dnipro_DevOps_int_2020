@@ -1,0 +1,9 @@
+---
+- name: apply roles for webservers
+  hosts: WEB
+  become: yes
+
+
+  roles:
+  - { role: web_nginx, when: ansible_system == 'Linux' }
+

@@ -1,0 +1,16 @@
+
+[LB]
+loadbalancer ansible_host=192.168.0.201
+
+
+[WEB]
+web1 ansible_host=192.168.0.210
+web2 ansible_host=192.168.0.211
+
+
+
+
+[DB]
+db_server ansible_host=192.168.0.220
+
+

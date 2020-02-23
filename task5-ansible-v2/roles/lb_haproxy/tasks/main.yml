@@ -1,0 +1,66 @@
+---
+# tasks file for loadbalancer
+
+- name: ping servers
+  ping:
+
+- name: check linux distro
+  debug: var=ansible_os_family
+
+- name: iptables flush filter
+  iptables:
+    chain: "{{ item }}"
+    flush: yes
+  with_items:  [ 'INPUT', 'FORWARD', 'OUTPUT' ]
+
+- name: save rules iptables
+  shell: /sbin/iptables-save  > /etc/sysconfig/iptables
+
+- sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Ensure SELinux is set to disabled mode
+  lineinfile:
+    path: /etc/selinux/config
+    regexp: '^SELINUX='
+    line: SELINUX=disabled
+
+- name: apply turn off selinux without reboot
+  shell: setenforce 0
+
+- name: Install dependensies and haproxy
+  yum:
+    name:
+      - deltarpm
+      - haproxy
+    state: latest
+
+- name: copy config haproxy
+  template: src=haproxy.cfg.j2 dest={{ destin_haproxy_folder }}/haproxy.cfg owner=haproxy group=haproxy
+  notify: restart haproxy
+
+#- name: Chown haproxy cfg
+#  file:
+#    path: {{ destin_haproxy_folder }}
+#    owner: haproxy
+#    group: haproxy
+#    state: directory
+#    recurse: yes
+                      
+
+#  copy: src=haproxy.cfg dest={{ destin_haproxy_folder }} owner=proxy group=haproxy
+#- name:  copying  index1.html.j2 to nginx1
+#  template: src=index1.html.j2  dest={{ destin_dir_nginx1 }}/index.html  mode=0555
+
+
+- name: start haproxy
+  service:
+    name: haproxy
+    state: started
+    enabled: yes
+
+

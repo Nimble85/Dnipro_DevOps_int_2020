@@ -1,0 +1,234 @@
+---
+# tasks file for web
+- name: ping servers
+  ping:
+
+- name: check linux distro
+  debug: var=ansible_os_family
+
+#- name: update all packages
+#  yum:
+#    name: '*'
+#    state: latest
+- name: iptables flush filter
+  iptables:
+    chain: "{{ item }}"
+    flush: yes
+  with_items:  [ 'INPUT', 'FORWARD', 'OUTPUT' ]
+
+- name: save rules iptables
+  shell: /sbin/iptables-save  > /etc/sysconfig/iptables
+
+- sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Ensure SELinux is set to disabled mode
+  lineinfile:
+    path: /etc/selinux/config
+    regexp: '^SELINUX='
+    line: SELINUX=disabled
+
+- name: apply turn off selinux without reboot
+  shell: setenforce 0
+  
+- name: Install Nginx
+  yum:
+    name:
+      - nginx
+      - php-fpm 
+      - php-common
+      - php
+      - php-cli 
+      - php-mysql 
+#      - php-gd
+#      - php-ldap 
+#      - php-odbc 
+#      - php-pdo 
+#      - php-pecl-memcache 
+#      - php-opcache 
+#      - php-pear 
+#      - php-xml  
+#      - php-xmlrpc 
+#      - php-mbstring 
+#      - php-snmp 
+#      - php-soap 
+#      - php-zip
+    state: latest
+
+- name: create folder /var/www/project.local
+  file:
+    path: /var/www/project.local
+    state: directory
+    owner: nginx
+    group: nginx
+    mode : '0777'
+
+- name: create log file for site
+  file:
+    path: /var/log/nginx/project.local-access.log  
+    state: touch
+
+
+- name: create err log file for site
+  file:
+    path: /var/log/nginx/project.local--error.log
+    state: touch
+
+
+#- name: create folder /etc/nginx/sites-available
+#  file: 
+#    path: /etc/nginx/sites-available
+#    state: directory
+#    owner: nginx
+#    group: nginx
+
+#- name: create folder /etc/nginx/sites-enabled
+#  file:
+#    path: /etc/nginx/sites-enabled
+#    state: directory
+#    owner: nginx
+#    group: nginx
+
+
+#- name: copy config for mysite  nginx
+#  copy: src=project.local dest=/etc/nginx/sites-available  owner=nginx group=nginx
+#  notify: restart nginx
+
+#- name: Create a symbolic link to sites-enabled
+#  file:
+#    src: /etc/nginx/sites-available/project.local
+#    dest: /etc/nginx/sites-enabled/project.local
+#    owner: nginx
+#    group: nginx
+#    state: link
+
+- name: add domain project.local to host file
+  lineinfile: 
+    path: /etc/hosts
+    line: 127.0.0.1  project.local
+
+- name: copy  mysite  
+  copy: src=site/ dest=/var/www/project.local/  owner=nginx group=nginx
+  notify: restart nginx
+
+#- name: copy temlate config php site
+#  template: src=admin-auth.php.j2 dest=/var/www/project.local/admin-auth.php owner=nginx group=nginx
+#  notify: restart nginx
+   
+- name: copy config nginx
+  copy: src=nginx.conf dest={{ destin_nginx_folder }}/nginx.conf  owner=nginx group=nginx
+  notify: restart nginx  
+
+########### try 10 ################
+
+- name: configuring php.ini
+  lineinfile:
+    path: /etc/php.ini
+    line: cgi.fix_pathinfo=0
+
+- name: Replace listen  string mfp conf
+  lineinfile:
+    path  : /etc/php-fpm.d/www.conf
+    regexp: '^listen = 127\.0\.0\.1'
+    line  : ;listen = 127.0.0.1:9000
+  notify: restart php-fpm
+
+
+- name: add string in www.comf
+  blockinfile:
+    path: /etc/php-fpm.d/www.conf
+    block: |
+      listen = /var/run/php-fpm/php-fpm.sock
+      listen.mode = 0660
+      listen.owner = nginx
+      listen.group = nginx
+  notify: restart php-fpm
+
+- name: Replace a apache user to nginx
+  lineinfile:
+    path  :  /etc/php-fpm.d/www.conf
+    regexp: '^user = '
+    line  : user = nginx
+  notify: restart php-fpm
+
+- name: Replace a apache group to nginx
+  lineinfile:
+    path  :  /etc/php-fpm.d/www.conf
+    regexp: '^group = '
+    line  : group = nginx
+  notify: restart php-fpm
+############ end try 10 #################
+
+
+#- name: Replace listen  string mfp conf
+#  lineinfile:
+#    path  : /etc/php-fpm.d/www.conf
+#    regexp: '^listen = 127\.0\.0\.1'
+#    line  : ;listen = 127.0.0.1:9000
+#  notify: restart php-fpm
+
+#- name: Replace a apache user to nginx
+#  lineinfile:
+#    path  :  /etc/php-fpm.d/www.conf
+#    regexp: '^user = '
+#    line  : user = nginx
+#  notify: restart php-fpm
+
+#- name: Replace a apache group to nginx
+#  lineinfile:
+#    path  :  /etc/php-fpm.d/www.conf
+#    regexp: '^group = '
+#    line  : group = nginx
+#  notify: restart php-fpm
+
+#- name: add string in www.comf
+#  blockinfile:
+#    path: /etc/php-fpm.d/www.conf
+#    block: |
+#      listen = /var/run/php-fpm/php-fpm.sock
+#      listen.mode = 0660
+#      listen.owner = nginx
+#      listen.group = nginx
+#  notify: restart php-fpm
+
+- name: start php-fpm
+  service:
+      name: php-fpm
+      state: started
+      enabled: yes
+
+
+- name: start nginx
+  service:
+      name: nginx
+      state: started
+      enabled: yes
+
+- name: test services
+  command: systemctl status {{ item }}
+  with_items:
+    - php-fpm
+    - nginx
+  register: service_status
+
+- debug: 
+    var: service_status
+
+#- name: check sock
+#  shell: ls -l /var/run/php-fpm/php-fpm.sock 
+#  register: sock_info
+#- debug:
+#    var: sock_info
+
+- name: check services open ports
+  shell: netstat -tlpn
+  register: netstat_result
+
+- debug:
+    var: netstat_result
+
+              

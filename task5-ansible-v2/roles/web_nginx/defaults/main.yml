@@ -1,0 +1,10 @@
+---
+# defaults file for docker_nginx
+#
+destin_nginx_folder : /etc/nginx/
+#destin_dir_nginx1: /home/ec2-user/project/src1
+#destin_dir_nginx2: /home/ec2-user/project/src2
+#destin_project_folder: /home/ec2-user/project
+#site1: Container Nginx N1
+#site2: Container Nginx N2
+

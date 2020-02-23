@@ -1,0 +1,11 @@
+---
+
+- name: apply roles for loadbalancer
+  hosts: LB
+  become: yes
+
+
+  roles:
+  - { role: lb_haproxy, when: ansible_system == 'Linux' }
+
+

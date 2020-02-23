@@ -1,0 +1,10 @@
+---
+# defaults file for lb_haproxy
+destin_haproxy_folder : /etc/haproxy/
+ip_ext_lb             : 192.168.0.201
+port_ext_lb           : 80
+ip_nginx_1            : 20.20.20.210
+port_nginx_1          : 80
+ip_nginx_2            : 20.20.20.211
+port_nginx_2          : 80
+balance_method        : roundrobin
