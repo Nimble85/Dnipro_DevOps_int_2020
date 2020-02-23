@@ -7,10 +7,26 @@ Steps:
   1. Apply role lb_haproxy
      a. install haproxy 
      b. copy template config 
+  2. Apply role web_nginx
+     2.1  Proconfiguring host (disablr selinux, turn on ip forward)
+     2.2 install nginx, php-fpm, php and dependensy
+     2.3 create folder for site 
+     2.4 copy site
+     2.5 copy config nginx
+     2.6 configuring php.ini
+     2.7 Replace string mfp conf 
+     2.8 start php-fpm nginx
+     2.9 test runing sevices
+  3. Apply role base_db
+     3.1 Proconfiguring host 
+     3.2 install  mariadb and dependecy
+     3.3 Copy database dump file
+     3.4 Restore database
+     3.5 Create database user
 
 ### haproxy.cfg.j2 
 
-'''
+```
 global
     log         /var/log  local2
 
@@ -46,20 +62,11 @@ backend nginx_pool
     server  web1 {{ ip_nginx_1 }}:{{ port_nginx_1 }} check
     server  web2 {{ ip_nginx_2 }}:{{ port_nginx_2 }} check
 
-'''
-  2. Apply role web_nginx
-     2.1  Proconfiguring host (disablr selinux, turn on ip forward)
-     2.2 install nginx, php-fpm, php and dependensy
-     2.3 create folder for site 
-     2.4 copy site
-     2.5 copy config nginx
-     2.6 configuring php.ini
-     2.7 Replace string mfp conf 
-     2.8 start php-fpm nginx
-     2.9 test runing sevices
+```
+
 
 ### roles/web_nginx/tasks/main.yml
-'''
+```
 ---
 # tasks file for web
 - name: ping servers
@@ -209,16 +216,11 @@ backend nginx_pool
 
 - debug:
     var: netstat_result
-'''
+```
 
-3. Apply role base_db
-   3.1 Proconfiguring host 
-   3.2 install  mariadb and dependecy
-   3.3 Copy database dump file
-   3.4 Restore database
-   3.5 Create database user
 
-''' 
+### roles/base_db/tasks/main.yml
+``` 
 ---
 # tasks file for base_db
 - name: ping servers
@@ -300,4 +302,4 @@ backend nginx_pool
     password: "{{ dbpass }}"
     priv: '*.*:ALL'
     state: present
-'''
+```
