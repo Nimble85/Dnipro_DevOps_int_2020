@@ -292,3 +292,24 @@ server web2 {{ hostvars['web2'].ansible_host }}:443 check port 443
 
 - name: apply iptables rules for base_db
   include_task: iptables-rules-db.yml
+```
+
+
+# roles/web_nginx/tasks/iptable-rules-web.yml
+```
+---
+- iptables_raw:
+  name: rules
+    rules: |
+      -A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+      -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
+      -A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
+      -A INPUT -p all -m state --state ESTABLISHED,RELATED -j ACCEPT
+      -A OUTPUT -p all -m state --state ESTABLISHED,RELATED -j ACCEPT
+      -A INPUT -p icmp -j ACCEPT
+      -A OUTPUT -p tcp -j ACCEPT
+      
+- name: save iptables
+  command: iptables-save
+```
+
