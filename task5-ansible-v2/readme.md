@@ -13,6 +13,7 @@ Steps:
   1. Apply role lb_haproxy
      a. install haproxy 
      b. copy template config 
+     c. start haproxy
   2. Apply role web_nginx
      2.1  Proconfiguring host (disablr selinux, turn on ip forward)
      2.2 install nginx, php-fpm, php and dependensy
