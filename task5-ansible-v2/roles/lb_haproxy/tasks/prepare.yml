@@ -1,4 +1,10 @@
 ---
+- name: disable firewalld
+  service:
+    name: firewalld
+    state: stopped
+    enabled: no
+
 - name: iptables flush filter
   iptables:
     chain: "{{ item }}"
