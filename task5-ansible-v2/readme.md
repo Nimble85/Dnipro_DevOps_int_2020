@@ -2,6 +2,12 @@
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task5-ansible-v2/screenshot/pic1.png  )
 
 ## Solution
+
+Solution for task will bу realisen in local enveronment virtualbox VM.
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task5-ansible-v2/screenshot/pic1_1.png  )
+
+### As base application wil be use "CRUD Sample: PHP, Bootstrap and MySQL" from GitHub     
+https://github.com/medaimane/crud-php-pdo-bootstrap-mysql
 ```
 Steps:
   1. Apply role lb_haproxy
@@ -11,19 +17,33 @@ Steps:
      2.1  Proconfiguring host (disablr selinux, turn on ip forward)
      2.2 install nginx, php-fpm, php and dependensy
      2.3 create folder for site 
-     2.4 copy site
-     2.5 copy config nginx
-     2.6 configuring php.ini
-     2.7 Replace string mfp conf 
-     2.8 start php-fpm nginx
-     2.9 test runing sevices
+     2.4 copy site 
+     2.5 copy template dbconfig.php.j2 with vault pass
+     2.6 copy nginx.conf with php and ssl config
+     2.7 configuring php.ini
+     2.8 create dir and copy ssl sefsigned sert
+     2.9 Replace string mfp conf 
+     2.10 start php-fpm nginx
+     2.11 test runing sevices
   3. Apply role base_db
      3.1 Proconfiguring host 
      3.2 install  mariadb and dependecy
      3.3 Copy database dump file
      3.4 Restore database
-     3.5 Create database user
+     3.5 Create database user with vault pass
 ```
+For run
+## ansible-playbook main.yml --ask-vault-pass
+
+results:
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task5-ansible-v2/screenshot/pic2.png  )
+
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task5-ansible-v2/screenshot/pic3.png  )
+
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task5-ansible-v2/screenshot/pic4.png  )
+
+
+Review key-files:
 ### haproxy.cfg.j2 
 
 ```
@@ -57,14 +77,65 @@ frontend  www
     default_backend nginx_pool
 
 backend nginx_pool
-    balance     roundrobin
+    balance     {{ balance_method }}
     mode http
     server  web1 {{ ip_nginx_1 }}:{{ port_nginx_1 }} check
     server  web2 {{ ip_nginx_2 }}:{{ port_nginx_2 }} check
 
 ```
+### roles/lb_haproxy/tasks/main.yml
+```
+---
+# tasks file for loadbalancer
 
+- name: ping servers
+  ping:
 
+- name: check linux distro
+  debug: var=ansible_os_family
+
+- name: iptables flush filter
+  iptables:
+    chain: "{{ item }}"
+    flush: yes
+  with_items:  [ 'INPUT', 'FORWARD', 'OUTPUT' ]
+
+- name: save rules iptables
+  shell: /sbin/iptables-save  > /etc/sysconfig/iptables
+
+- sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Ensure SELinux is set to disabled mode
+  lineinfile:
+    path: /etc/selinux/config
+    regexp: '^SELINUX='
+    line: SELINUX=disabled
+
+- name: apply turn off selinux without reboot
+  shell: setenforce 0
+
+- name: Install dependensies and haproxy
+  yum:
+    name:
+      - deltarpm
+      - haproxy
+    state: latest
+
+- name: copy config haproxy
+  template: src=haproxy.cfg.j2 dest={{ destin_haproxy_folder }}/haproxy.cfg owner=haproxy group=haproxy
+  notify: restart haproxy
+
+- name: start haproxy
+  service:
+    name: haproxy
+    state: started
+    enabled: yes
+```
 ### roles/web_nginx/tasks/main.yml
 ```
 ---
@@ -127,30 +198,56 @@ backend nginx_pool
   file:
     path: /var/log/nginx/project.local-access.log  
     state: touch
-
+    name : nginx
+    group: nginx
 
 - name: create err log file for site
   file:
-    path: /var/log/nginx/project.local--error.log
+    path : /var/log/nginx/project.local-error.log
     state: touch
+    name : nginx
+    group: nginx
 
-- name: add domain project.local to host file
-  lineinfile: 
+- name: add domain project.local and ssl.progect,local to host file
+  blockinfile:
     path: /etc/hosts
-    line: 127.0.0.1  project.local
+    block: |
+      127.0.0.1  project.local
+      127.0.0.1  ssl.project.local
 
 - name: copy  mysite  
   copy: src=site/ dest=/var/www/project.local/  owner=nginx group=nginx
   notify: restart nginx
 
- 
-- name: copy config nginx
+- name: copy temlate config php site Vault pass for connect to base
+  template: src=dbconfig.php.j2 dest=/var/www/project.local/dbconfig.php owner=nginx group=nginx
+  notify: restart nginx
+   
+- name: copy confi===g nginx
   copy: src=nginx.conf dest={{ destin_nginx_folder }}/nginx.conf  owner=nginx group=nginx
   notify: restart nginx  
 
-########### try 10 ################
+#### ssl #######
+- name: create folder for ssl
+  file:
+    path: /etc/ssl/private
+    state: directory
+    mode: '0700'
+- name: copy selfsigned key to /etc/ssl/private
+  copy: src=ssl/nginx-selfsigned.key dest=/etc/ssl/private/nginx-selfsigned.key
+  notify: restart nginx
 
-- name: configuring php.ini
+- name: copy dhparam.pem to /etc/ssl/certs/
+  copy: src=ssl/dhparam.pem  dest=/etc/ssl/certs/dhparam.pem
+  notify: restart nginx
+
+- name: copy nginx-selfsigned.crt to /etc/ssl/certs/
+  copy: src=ssl/nginx-selfsigned.crt dest=/etc/ssl/certs/nginx-selfsigned.crt
+  notify: restart nginx
+##### end ssl ####
+
+########### configure php-fpm  ################
+- name: conure confguring php.ini
   lineinfile:
     path: /etc/php.ini
     line: cgi.fix_pathinfo=0
@@ -185,14 +282,13 @@ backend nginx_pool
     regexp: '^group = '
     line  : group = nginx
   notify: restart php-fpm
-############ end try 10 #################
+############ end php-fpm  #################
 
 - name: start php-fpm
   service:
       name: php-fpm
       state: started
       enabled: yes
-
 
 - name: start nginx
   service:
@@ -210,14 +306,19 @@ backend nginx_pool
 - debug: 
     var: service_status
 
+#- name: check sock
+#  shell: ls -l /var/run/php-fpm/php-fpm.sock 
+#  register: sock_info
+#- debug:
+#    var: sock_info
+
 - name: check services open ports
   shell: netstat -tlpn
   register: netstat_result
 
 - debug:
     var: netstat_result
-```
-
+ ```
 
 ### roles/base_db/tasks/main.yml
 ``` 
@@ -228,6 +329,11 @@ backend nginx_pool
 
 - name: check linux distro
   debug: var=ansible_os_family
+
+#- name: update all packages
+#  yum:
+#    name: '*'
+#    state: latest
 
 - name: iptables flush filter
   iptables:
@@ -246,7 +352,6 @@ backend nginx_pool
 
 - name: apply turn off selinux without reboot
   shell: setenforce 0
-
 
 - name: install mariadb and dependecy
   yum:
@@ -288,7 +393,7 @@ backend nginx_pool
     state: import
     target: /tmp/dbpdo.sql
 
-- name: Create database user  with name 'dppdo@'%'' and password 'dppdo' with all database privileges
+- name: Create database user  with name 'dppdo@'%'' and VAULT password  with all database privileges
   mysql_user:
     name: "{{ dbuser }}"
     host: "%"
@@ -296,10 +401,9 @@ backend nginx_pool
     priv: '*.*:ALL'
     state: present
 
-- name: Create database user  with name 'dppdo@localhost' and password 'dppdo' with all database privileges
+- name: Create database user  with name 'dppdo@localhost' and VAULT password  with all database privileges
   mysql_user:
     name: "{{ dbuser }}"
     password: "{{ dbpass }}"
     priv: '*.*:ALL'
     state: present
-```
