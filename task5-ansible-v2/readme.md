@@ -33,8 +33,8 @@ Steps:
      3.2 install  mariadb and dependecy
      3.3 run mariadb
      3.4 Copy database dump file
-     3.5 Restore database
-     3.6 Create database user with vault pass
+     3.5 Create database user with vault pass
+     3.5 Restore database from user
      3.7 apply iptable rules
 ```
 For run
@@ -193,14 +193,14 @@ server web2 {{ hostvars['web2'].ansible_host }}:443 check port 443
 
 - name: start php-fpm
   service:
-      name: php-fpm
-      state: started
+      name   : php-fpm
+      state  : started
       enabled: yes
 
 - name: start nginx
   service:
-      name: nginx
-      state: started
+      name   : nginx
+      state  : started
       enabled: yes
 
 - name: test services
@@ -260,35 +260,42 @@ server web2 {{ hostvars['web2'].ansible_host }}:443 check port 443
 
 - name: start mariadb
   service:
-    name: mariadb
-    state: started
+    name   : mariadb
+    state  : started
     enabled: yes
 
 - name: Copy database dump file
   copy:
-    src: sql/dbpdo.sql
+    src : sql/dbpdo.sql
     dest: /tmp
 
-- name: Restore database
+- name: Create a new database
   mysql_db:
-    name: "{{ dbname }}"
-    state: import
-    target: /tmp/dbpdo.sql
-
+    name  : "{{ dbname }}"
+    state : present
+    
 - name: Create database user  with name 'dppdo@'%'' and VAULT password  with all database privileges
   mysql_user:
-    name: "{{ dbuser }}"
-    host: "%"
+    name    : "{{ dbuser }}"
+    host    : "%"
     password: "{{ dbpass }}"
-    priv: '{{ dbname }}.*:ALL'
-    state: present
-
+    priv    : '{{ dbname }}.*:ALL'
+    state   : present
+  
 - name: Create database user  with name 'dppdo@localhost' and VAULT password  with all database privileges
   mysql_user:
-    name: "{{ dbuser }}"
+    name    : "{{ dbuser }}"
     password: "{{ dbpass }}"
-    priv: '{{ dbname }}.*:ALL'
-    state: present
+    priv    : '{{ dbname }}.*:ALL'
+    state   : present
+    
+- name: Restore database from user dppdo@'%
+  mysql_db:
+    login_user    : "{{ dbuser }}"
+    login_password: "{{ dbpass }}"
+    name          : "{{ dbname }}"
+    state         : import
+    target        : /tmp/dbpdo.sql
 
 - name: apply iptables rules for base_db
   include_task: iptables-rules-db.yml
