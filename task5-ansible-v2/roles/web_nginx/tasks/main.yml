@@ -112,7 +112,7 @@
 
 ########### configure php-fpm  ################
 
-- name: conure confguring php.ini
+- name: confguring php.ini
   lineinfile:
     path: /etc/php.ini
     line: cgi.fix_pathinfo=0
