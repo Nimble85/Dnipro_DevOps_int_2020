@@ -48,30 +48,13 @@ Review key-files:
 
 ```
 global
-    log         /var/log  local2
-
-    chroot      /var/lib/haproxy
-    pidfile     /var/run/haproxy.pid
-    maxconn     4000
-    user        haproxy
-    group       haproxy
-    daemon
-
+  //////
+   skip
+  /////
 defaults
-    mode                    http
-    log                     global
-    option                  httplog
-    option                  redispatch
-    retries                 3
-    timeout http-request    10s
-    timeout queue           1m
-    timeout connect         10s
-    timeout client          1m
-    timeout server          1m
-    timeout http-keep-alive 10s
-    timeout check           10s
-    maxconn                 3000
-
+  ////////
+  skip
+  ////////
 frontend  www
     bind {{ ip_ext_lb }}:{{ port_ext_lb }}
     default_backend nginx_pool
