@@ -83,7 +83,7 @@
     state: import
     target: /tmp/dbpdo.sql
 
-- name: Create database user  with name 'dppdo@'%'' and password 'dppdo' with all database privileges
+- name: Create database user  with name 'dppdo@'%'' and VAULT password  with all database privileges
   mysql_user:
     name: "{{ dbuser }}"
     host: "%"
@@ -91,7 +91,7 @@
     priv: '*.*:ALL'
     state: present
 
-- name: Create database user  with name 'dppdo@localhost' and password 'dppdo' with all database privileges
+- name: Create database user  with name 'dppdo@localhost' and VAULT password  with all database privileges
   mysql_user:
     name: "{{ dbuser }}"
     password: "{{ dbpass }}"

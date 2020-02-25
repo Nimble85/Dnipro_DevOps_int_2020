@@ -63,7 +63,7 @@ frontend  www
 #    balance     roundrobin
 #    server      static 127.0.0.1:4331 check
 backend nginx_pool
-    balance     roundrobin
+    balance     {{ balance_method }}
     mode http
     server  web1 {{ ip_nginx_1 }}:{{ port_nginx_1 }} check
     server  web2 {{ ip_nginx_2 }}:{{ port_nginx_2 }} check

@@ -44,19 +44,6 @@
       - php
       - php-cli 
       - php-mysql 
-#      - php-gd
-#      - php-ldap 
-#      - php-odbc 
-#      - php-pdo 
-#      - php-pecl-memcache 
-#      - php-opcache 
-#      - php-pear 
-#      - php-xml  
-#      - php-xmlrpc 
-#      - php-mbstring 
-#      - php-snmp 
-#      - php-soap 
-#      - php-zip
     state: latest
 
 - name: create folder /var/www/project.local
@@ -71,61 +58,61 @@
   file:
     path: /var/log/nginx/project.local-access.log  
     state: touch
-
+    name : nginx
+    group: nginx
 
 - name: create err log file for site
   file:
-    path: /var/log/nginx/project.local--error.log
+    path : /var/log/nginx/project.local-error.log
     state: touch
+    name : nginx
+    group: nginx
 
-
-#- name: create folder /etc/nginx/sites-available
-#  file: 
-#    path: /etc/nginx/sites-available
-#    state: directory
-#    owner: nginx
-#    group: nginx
-
-#- name: create folder /etc/nginx/sites-enabled
-#  file:
-#    path: /etc/nginx/sites-enabled
-#    state: directory
-#    owner: nginx
-#    group: nginx
-
-
-#- name: copy config for mysite  nginx
-#  copy: src=project.local dest=/etc/nginx/sites-available  owner=nginx group=nginx
-#  notify: restart nginx
-
-#- name: Create a symbolic link to sites-enabled
-#  file:
-#    src: /etc/nginx/sites-available/project.local
-#    dest: /etc/nginx/sites-enabled/project.local
-#    owner: nginx
-#    group: nginx
-#    state: link
-
-- name: add domain project.local to host file
-  lineinfile: 
+- name: add domain project.local and ssl.progect,local to host file
+  blockinfile:
     path: /etc/hosts
-    line: 127.0.0.1  project.local
+    block: |
+      127.0.0.1  project.local
+      127.0.0.1  ssl.project.local
+
 
 - name: copy  mysite  
   copy: src=site/ dest=/var/www/project.local/  owner=nginx group=nginx
   notify: restart nginx
 
-#- name: copy temlate config php site
-#  template: src=admin-auth.php.j2 dest=/var/www/project.local/admin-auth.php owner=nginx group=nginx
-#  notify: restart nginx
+- name: copy temlate config php site Vault pass for connect to base
+  template: src=dbconfig.php.j2 dest=/var/www/project.local/dbconfig.php owner=nginx group=nginx
+  notify: restart nginx
    
-- name: copy config nginx
+- name: copy confi===g nginx
   copy: src=nginx.conf dest={{ destin_nginx_folder }}/nginx.conf  owner=nginx group=nginx
   notify: restart nginx  
 
-########### try 10 ################
+#### ssl #######
+- name: create folder for ssl
+  file:
+    path: /etc/ssl/private
+    state: directory
+    mode: '0700'
+- name: copy selfsigned key to /etc/ssl/private
+  copy: src=ssl/nginx-selfsigned.key dest=/etc/ssl/private/nginx-selfsigned.key
+  notify: restart nginx
 
-- name: configuring php.ini
+- name: copy dhparam.pem to /etc/ssl/certs/
+  copy: src=ssl/dhparam.pem  dest=/etc/ssl/certs/dhparam.pem
+  notify: restart nginx
+
+- name: copy nginx-selfsigned.crt to /etc/ssl/certs/
+  copy: src=ssl/nginx-selfsigned.crt dest=/etc/ssl/certs/nginx-selfsigned.crt
+  notify: restart nginx
+
+
+##### end ssl ####
+
+
+########### configure php-fpm  ################
+
+- name: conure confguring php.ini
   lineinfile:
     path: /etc/php.ini
     line: cgi.fix_pathinfo=0
@@ -161,39 +148,9 @@
     regexp: '^group = '
     line  : group = nginx
   notify: restart php-fpm
-############ end try 10 #################
+############ end php-fpm  #################
 
 
-#- name: Replace listen  string mfp conf
-#  lineinfile:
-#    path  : /etc/php-fpm.d/www.conf
-#    regexp: '^listen = 127\.0\.0\.1'
-#    line  : ;listen = 127.0.0.1:9000
-#  notify: restart php-fpm
-
-#- name: Replace a apache user to nginx
-#  lineinfile:
-#    path  :  /etc/php-fpm.d/www.conf
-#    regexp: '^user = '
-#    line  : user = nginx
-#  notify: restart php-fpm
-
-#- name: Replace a apache group to nginx
-#  lineinfile:
-#    path  :  /etc/php-fpm.d/www.conf
-#    regexp: '^group = '
-#    line  : group = nginx
-#  notify: restart php-fpm
-
-#- name: add string in www.comf
-#  blockinfile:
-#    path: /etc/php-fpm.d/www.conf
-#    block: |
-#      listen = /var/run/php-fpm/php-fpm.sock
-#      listen.mode = 0660
-#      listen.owner = nginx
-#      listen.group = nginx
-#  notify: restart php-fpm
 
 - name: start php-fpm
   service:
