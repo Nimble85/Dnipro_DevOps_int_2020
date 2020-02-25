@@ -14,6 +14,7 @@ Steps:
      a. install haproxy 
      b. copy template config 
      c. start haproxy
+     d. apply iptable rules
   2. Apply role web_nginx
      2.1  Proconfiguring host (disablr selinux, turn on ip forward)
      2.2 install nginx, php-fpm, php and dependensy
@@ -26,6 +27,7 @@ Steps:
      2.9 Replace string mfp conf 
      2.10 start php-fpm nginx
      2.11 test runing sevices
+     2.12 apply iptable rules
   3. Apply role base_db
      3.1 Proconfiguring host 
      3.2 install  mariadb and dependecy
@@ -33,6 +35,7 @@ Steps:
      3.4 Copy database dump file
      3.5 Restore database
      3.6 Create database user with vault pass
+     3.7 apply iptable rules
 ```
 For run
 ## ansible-playbook main.yml --ask-vault-pass
@@ -83,36 +86,11 @@ server web2 {{ hostvars['web2'].ansible_host }}:443 check port 443
 ---
 # tasks file for loadbalancer
 
-- name: ping servers
-  ping:
-
 - name: check linux distro
   debug: var=ansible_os_family
 
-- name: iptables flush filter
-  iptables:
-    chain: "{{ item }}"
-    flush: yes
-  with_items:  [ 'INPUT', 'FORWARD', 'OUTPUT' ]
-
-- name: save rules iptables
-  shell: /sbin/iptables-save  > /etc/sysconfig/iptables
-
-- sysctl:
-    name: net.ipv4.ip_forward
-    value: '1'
-    sysctl_set: yes
-    state: present
-    reload: yes
-
-- name: Ensure SELinux is set to disabled mode
-  lineinfile:
-    path: /etc/selinux/config
-    regexp: '^SELINUX='
-    line: SELINUX=disabled
-
-- name: apply turn off selinux without reboot
-  shell: setenforce 0
+- name: prepare host before task
+  include_task: prepare.yml
 
 - name: Install dependensies and haproxy
   yum:
@@ -123,63 +101,37 @@ server web2 {{ hostvars['web2'].ansible_host }}:443 check port 443
 
 - name: copy config haproxy
   template: src=haproxy.cfg.j2 dest={{ destin_haproxy_folder }}/haproxy.cfg owner=haproxy group=haproxy
-  notify: restart haproxy
+  notify: reload haproxy
+
 
 - name: start haproxy
   service:
     name: haproxy
     state: started
     enabled: yes
+
+- name: apply iptables rules for loadbalancer
+  include_task: iptables-rules-lb.yml
 ```
 ### roles/web_nginx/tasks/main.yml
 ```
 ---
 # tasks file for web
-- name: ping servers
-  ping:
 
 - name: check linux distro
   debug: var=ansible_os_family
 
-#- name: update all packages
-#  yum:
-#    name: '*'
-#    state: latest
-- name: iptables flush filter
-  iptables:
-    chain: "{{ item }}"
-    flush: yes
-  with_items:  [ 'INPUT', 'FORWARD', 'OUTPUT' ]
-
-- name: save rules iptables
-  shell: /sbin/iptables-save  > /etc/sysconfig/iptables
-
-- sysctl:
-    name: net.ipv4.ip_forward
-    value: '1'
-    sysctl_set: yes
-    state: present
-    reload: yes
-
-- name: Ensure SELinux is set to disabled mode
-  lineinfile:
-    path: /etc/selinux/config
-    regexp: '^SELINUX='
-    line: SELINUX=disabled
-
-- name: apply turn off selinux without reboot
-  shell: setenforce 0
+- name: prepare host before task
+  include_task: prepare.yml
   
 - name: Install Nginx
   yum:
     name:
       - nginx
-      - php-fpm 
-      - php-common
-      - php
-      - php-cli 
-      - php-mysql 
     state: latest
+    
+- name: install php and dependency
+  include_task: install-php-dep.yml
 
 - name: create folder /var/www/project.local
   file:
@@ -187,21 +139,7 @@ server web2 {{ hostvars['web2'].ansible_host }}:443 check port 443
     state: directory
     owner: nginx
     group: nginx
-    mode : '0777'
-
-- name: create log file for site
-  file:
-    path: /var/log/nginx/project.local-access.log  
-    state: touch
-    name : nginx
-    group: nginx
-
-- name: create err log file for site
-  file:
-    path : /var/log/nginx/project.local-error.log
-    state: touch
-    name : nginx
-    group: nginx
+    mode : '0644'
 
 - name: add domain project.local and ssl.progect,local to host file
   blockinfile:
@@ -212,15 +150,15 @@ server web2 {{ hostvars['web2'].ansible_host }}:443 check port 443
 
 - name: copy  mysite  
   copy: src=site/ dest=/var/www/project.local/  owner=nginx group=nginx
-  notify: restart nginx
+  notify: reload nginx
 
 - name: copy temlate config php site Vault pass for connect to base
   template: src=dbconfig.php.j2 dest=/var/www/project.local/dbconfig.php owner=nginx group=nginx
-  notify: restart nginx
+  notify: reload nginx
    
 - name: copy confi===g nginx
   copy: src=nginx.conf dest={{ destin_nginx_folder }}/nginx.conf  owner=nginx group=nginx
-  notify: restart nginx  
+  notify: reload nginx  
 
 #### ssl #######
 - name: create folder for ssl
@@ -230,54 +168,28 @@ server web2 {{ hostvars['web2'].ansible_host }}:443 check port 443
     mode: '0700'
 - name: copy selfsigned key to /etc/ssl/private
   copy: src=ssl/nginx-selfsigned.key dest=/etc/ssl/private/nginx-selfsigned.key
-  notify: restart nginx
+  notify: reload nginx
 
 - name: copy dhparam.pem to /etc/ssl/certs/
   copy: src=ssl/dhparam.pem  dest=/etc/ssl/certs/dhparam.pem
-  notify: restart nginx
+  notify: reload nginx
 
 - name: copy nginx-selfsigned.crt to /etc/ssl/certs/
   copy: src=ssl/nginx-selfsigned.crt dest=/etc/ssl/certs/nginx-selfsigned.crt
-  notify: restart nginx
+  notify: reload nginx
 ##### end ssl ####
 
-########### configure php-fpm  ################
-- name: conure confguring php.ini
+########### configure php.ini php-fpm  ################
+
+- name: copy template config php-fpm
+  template: src=www.conf.j2 dest=/etc/php-fpm.d/www.conf
+
+- name: confguring php.ini
   lineinfile:
     path: /etc/php.ini
     line: cgi.fix_pathinfo=0
 
-- name: Replace listen  string mfp conf
-  lineinfile:
-    path  : /etc/php-fpm.d/www.conf
-    regexp: '^listen = 127\.0\.0\.1'
-    line  : ;listen = 127.0.0.1:9000
-  notify: restart php-fpm
-
-- name: add string in www.comf
-  blockinfile:
-    path: /etc/php-fpm.d/www.conf
-    block: |
-      listen = /var/run/php-fpm/php-fpm.sock
-      listen.mode = 0660
-      listen.owner = nginx
-      listen.group = nginx
-  notify: restart php-fpm
-
-- name: Replace a apache user to nginx
-  lineinfile:
-    path  :  /etc/php-fpm.d/www.conf
-    regexp: '^user = '
-    line  : user = nginx
-  notify: restart php-fpm
-
-- name: Replace a apache group to nginx
-  lineinfile:
-    path  :  /etc/php-fpm.d/www.conf
-    regexp: '^group = '
-    line  : group = nginx
-  notify: restart php-fpm
-############ end php-fpm  #################
+############ end php.ini php-fpm  #################
 
 - name: start php-fpm
   service:
@@ -295,17 +207,23 @@ server web2 {{ hostvars['web2'].ansible_host }}:443 check port 443
   command: systemctl status {{ item }}
   with_items:
     - php-fpm
-    - nginx
-  register: service_status
-
+  register: service_status_php_fpm
 - debug: 
-    var: service_status
+    var: service_status_php_fpm 
 
-#- name: check sock
-#  shell: ls -l /var/run/php-fpm/php-fpm.sock 
-#  register: sock_info
-#- debug:
-#    var: sock_info
+- name: test services
+  command: systemctl status {{ item }}
+  with_items:
+    - nginx
+  register: service_status_nginx
+- debug: 
+    var: service_status_nginx
+
+- name: check sock
+  shell: ls -l /var/run/php-fpm/php-fpm.sock 
+  register: sock_info
+- debug:
+    var: sock_info
 
 - name: check services open ports
   shell: netstat -tlpn
@@ -313,40 +231,20 @@ server web2 {{ hostvars['web2'].ansible_host }}:443 check port 443
 
 - debug:
     var: netstat_result
+ 
+- name: apply iptables rules for webservers
+  include_task: iptables-rules-web.yml
  ```
 
 ### roles/base_db/tasks/main.yml
 ``` 
 ---
 # tasks file for base_db
-- name: ping servers
-  ping:
-
 - name: check linux distro
   debug: var=ansible_os_family
 
-#- name: update all packages
-#  yum:
-#    name: '*'
-#    state: latest
-
-- name: iptables flush filter
-  iptables:
-    chain: "{{ item }}"
-    flush: yes
-  with_items:  [ 'INPUT', 'FORWARD', 'OUTPUT' ]
-
-- name: save rules iptables
-  shell: /sbin/iptables-save  > /etc/sysconfig/iptables
-
-- name: Ensure SELinux is set to disabled mode
-  lineinfile:
-    path: /etc/selinux/config
-    regexp: '^SELINUX='
-    line: SELINUX=disabled
-
-- name: apply turn off selinux without reboot
-  shell: setenforce 0
+- name: prepare host before task
+  include_task: prepare.yml
 
 - name: install mariadb and dependecy
   yum:
@@ -354,22 +252,11 @@ server web2 {{ hostvars['web2'].ansible_host }}:443 check port 443
       - mariadb 
       - mariadb-server 
       - net-tools
-      - python
-      - python-pip
-      - MySQL-python
+ 
     state: latest
 
-- name: pip upgrade
-  shell: pip install --upgrade pip
-
-- name: disable strict sql
-  blockinfile:
-    path: /etc/mysql/conf.d/disable_strict_mode.cnf
-    block: |
-      [mysqld]
-      sql_mode=IGNORE_SPACE,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
-    create: yes
-  notify: restart mariadb
+- name: install Python and dependensy
+  include_task: install-py-depend.yml
 
 - name: start mariadb
   service:
@@ -393,12 +280,15 @@ server web2 {{ hostvars['web2'].ansible_host }}:443 check port 443
     name: "{{ dbuser }}"
     host: "%"
     password: "{{ dbpass }}"
-    priv: '*.*:ALL'
+    priv: '{{ dbname }}.*:ALL'
     state: present
 
 - name: Create database user  with name 'dppdo@localhost' and VAULT password  with all database privileges
   mysql_user:
     name: "{{ dbuser }}"
     password: "{{ dbpass }}"
-    priv: '*.*:ALL'
+    priv: '{{ dbname }}.*:ALL'
     state: present
+
+- name: apply iptables rules for base_db
+  include_task: iptables-rules-db.yml

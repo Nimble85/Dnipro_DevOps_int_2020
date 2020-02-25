@@ -1,36 +1,11 @@
 ---
 # tasks file for loadbalancer
 
-- name: ping servers
-  ping:
-
 - name: check linux distro
   debug: var=ansible_os_family
 
-- name: iptables flush filter
-  iptables:
-    chain: "{{ item }}"
-    flush: yes
-  with_items:  [ 'INPUT', 'FORWARD', 'OUTPUT' ]
-
-- name: save rules iptables
-  shell: /sbin/iptables-save  > /etc/sysconfig/iptables
-
-- sysctl:
-    name: net.ipv4.ip_forward
-    value: '1'
-    sysctl_set: yes
-    state: present
-    reload: yes
-
-- name: Ensure SELinux is set to disabled mode
-  lineinfile:
-    path: /etc/selinux/config
-    regexp: '^SELINUX='
-    line: SELINUX=disabled
-
-- name: apply turn off selinux without reboot
-  shell: setenforce 0
+- name: prepare host before task
+  include_task: prepare.yml
 
 - name: Install dependensies and haproxy
   yum:
@@ -41,15 +16,7 @@
 
 - name: copy config haproxy
   template: src=haproxy.cfg.j2 dest={{ destin_haproxy_folder }}/haproxy.cfg owner=haproxy group=haproxy
-  notify: restart haproxy
-
-#- name: Chown haproxy cfg
-#  file:
-#    path: {{ destin_haproxy_folder }}
-#    owner: haproxy
-#    group: haproxy
-#    state: directory
-#    recurse: yes
+  notify: reload haproxy
 
 
 - name: start haproxy
@@ -58,4 +25,5 @@
     state: started
     enabled: yes
 
-
+- name: apply iptables rules for loadbalancer
+  include_task: iptables-rules-lb.yml

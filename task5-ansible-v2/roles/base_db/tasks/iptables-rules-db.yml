@@ -1,0 +1,9 @@
+---
+- iptables_raw:
+    name: allow_tcp_3306
+    rules: '-A INPUT -p tcp -m tcp --dport 3306 -j ACCEPT'
+      
+- iptables_raw:
+    name: allow_tcp_22
+    rules: '-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT'
+    

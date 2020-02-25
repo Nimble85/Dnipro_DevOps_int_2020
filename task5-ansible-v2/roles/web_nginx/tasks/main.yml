@@ -1,7 +1,5 @@
 ---
 # tasks file for web
-- name: ping servers
-  ping:
 
 - name: check linux distro
   debug: var=ansible_os_family
@@ -10,41 +8,17 @@
 #  yum:
 #    name: '*'
 #    state: latest
-- name: iptables flush filter
-  iptables:
-    chain: "{{ item }}"
-    flush: yes
-  with_items:  [ 'INPUT', 'FORWARD', 'OUTPUT' ]
-
-- name: save rules iptables
-  shell: /sbin/iptables-save  > /etc/sysconfig/iptables
-
-- sysctl:
-    name: net.ipv4.ip_forward
-    value: '1'
-    sysctl_set: yes
-    state: present
-    reload: yes
-
-- name: Ensure SELinux is set to disabled mode
-  lineinfile:
-    path: /etc/selinux/config
-    regexp: '^SELINUX='
-    line: SELINUX=disabled
-
-- name: apply turn off selinux without reboot
-  shell: setenforce 0
+- name: prepare host before task
+  include_task: prepare.yml
   
 - name: Install Nginx
   yum:
     name:
       - nginx
-      - php-fpm 
-      - php-common
-      - php
-      - php-cli 
-      - php-mysql 
     state: latest
+    
+- name: install php and dependency
+  include_task: install-php-dep.yml
 
 - name: create folder /var/www/project.local
   file:
@@ -52,21 +26,7 @@
     state: directory
     owner: nginx
     group: nginx
-    mode : '0777'
-
-- name: create log file for site
-  file:
-    path: /var/log/nginx/project.local-access.log  
-    state: touch
-    name : nginx
-    group: nginx
-
-- name: create err log file for site
-  file:
-    path : /var/log/nginx/project.local-error.log
-    state: touch
-    name : nginx
-    group: nginx
+    mode : '0644'
 
 - name: add domain project.local and ssl.progect,local to host file
   blockinfile:
@@ -75,18 +35,17 @@
       127.0.0.1  project.local
       127.0.0.1  ssl.project.local
 
-
 - name: copy  mysite  
   copy: src=site/ dest=/var/www/project.local/  owner=nginx group=nginx
-  notify: restart nginx
+  notify: reload nginx
 
 - name: copy temlate config php site Vault pass for connect to base
   template: src=dbconfig.php.j2 dest=/var/www/project.local/dbconfig.php owner=nginx group=nginx
-  notify: restart nginx
+  notify: reload nginx
    
 - name: copy confi===g nginx
   copy: src=nginx.conf dest={{ destin_nginx_folder }}/nginx.conf  owner=nginx group=nginx
-  notify: restart nginx  
+  notify: reload nginx  
 
 #### ssl #######
 - name: create folder for ssl
@@ -96,61 +55,28 @@
     mode: '0700'
 - name: copy selfsigned key to /etc/ssl/private
   copy: src=ssl/nginx-selfsigned.key dest=/etc/ssl/private/nginx-selfsigned.key
-  notify: restart nginx
+  notify: reload nginx
 
 - name: copy dhparam.pem to /etc/ssl/certs/
   copy: src=ssl/dhparam.pem  dest=/etc/ssl/certs/dhparam.pem
-  notify: restart nginx
+  notify: reload nginx
 
 - name: copy nginx-selfsigned.crt to /etc/ssl/certs/
   copy: src=ssl/nginx-selfsigned.crt dest=/etc/ssl/certs/nginx-selfsigned.crt
-  notify: restart nginx
-
-
+  notify: reload nginx
 ##### end ssl ####
 
+########### configure php.ini php-fpm  ################
 
-########### configure php-fpm  ################
+- name: copy template config php-fpm
+  template: src=www.conf.j2 dest=/etc/php-fpm.d/www.conf
 
 - name: confguring php.ini
   lineinfile:
     path: /etc/php.ini
     line: cgi.fix_pathinfo=0
 
-- name: Replace listen  string mfp conf
-  lineinfile:
-    path  : /etc/php-fpm.d/www.conf
-    regexp: '^listen = 127\.0\.0\.1'
-    line  : ;listen = 127.0.0.1:9000
-  notify: restart php-fpm
-
-
-- name: add string in www.comf
-  blockinfile:
-    path: /etc/php-fpm.d/www.conf
-    block: |
-      listen = /var/run/php-fpm/php-fpm.sock
-      listen.mode = 0660
-      listen.owner = nginx
-      listen.group = nginx
-  notify: restart php-fpm
-
-- name: Replace a apache user to nginx
-  lineinfile:
-    path  :  /etc/php-fpm.d/www.conf
-    regexp: '^user = '
-    line  : user = nginx
-  notify: restart php-fpm
-
-- name: Replace a apache group to nginx
-  lineinfile:
-    path  :  /etc/php-fpm.d/www.conf
-    regexp: '^group = '
-    line  : group = nginx
-  notify: restart php-fpm
-############ end php-fpm  #################
-
-
+############ end php.ini php-fpm  #################
 
 - name: start php-fpm
   service:
@@ -169,17 +95,24 @@
   command: systemctl status {{ item }}
   with_items:
     - php-fpm
-    - nginx
-  register: service_status
-
+  register: service_status_php_fpm
 - debug: 
-    var: service_status
+    var: service_status_php_fpm 
 
-#- name: check sock
-#  shell: ls -l /var/run/php-fpm/php-fpm.sock 
-#  register: sock_info
-#- debug:
-#    var: sock_info
+- name: test services
+  command: systemctl status {{ item }}
+  with_items:
+    - nginx
+  register: service_status_nginx
+- debug: 
+    var: service_status_nginx
+
+
+- name: check sock
+  shell: ls -l /var/run/php-fpm/php-fpm.sock 
+  register: sock_info
+- debug:
+    var: sock_info
 
 - name: check services open ports
   shell: netstat -tlpn
@@ -187,5 +120,7 @@
 
 - debug:
     var: netstat_result
-
+ 
+- name: apply iptables rules for webservers
+  include_task: iptables-rules-web.yml
               

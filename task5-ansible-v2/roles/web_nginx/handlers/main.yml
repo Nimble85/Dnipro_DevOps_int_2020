@@ -1,17 +1,17 @@
 ---
 # handlers file for nginx
-- name: restart nginx
+- name: reload nginx
   service: 
     name : nginx
-    state: restarted
+    state: reloaded
 
-- name:  restart php-fpm
+- name:  reload php-fpm
   service:
     name : php-fpm
-    state: restarted
+    state: reloaded
 
-- name: restart httpd
+- name: reload httpd
   service:
     name: httpd
-    state: restarted
+    state: reloaded
 

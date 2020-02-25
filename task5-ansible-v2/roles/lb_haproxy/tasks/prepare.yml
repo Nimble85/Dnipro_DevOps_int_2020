@@ -1,3 +1,4 @@
+---
 - name: iptables flush filter
   iptables:
     chain: "{{ item }}"

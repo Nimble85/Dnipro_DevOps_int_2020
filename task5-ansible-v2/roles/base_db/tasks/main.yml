@@ -1,8 +1,5 @@
 ---
 # tasks file for base_db
-- name: ping servers
-  ping:
-
 - name: check linux distro
   debug: var=ansible_os_family
 
@@ -11,24 +8,8 @@
 #    name: '*'
 #    state: latest
 
-- name: iptables flush filter
-  iptables:
-    chain: "{{ item }}"
-    flush: yes
-  with_items:  [ 'INPUT', 'FORWARD', 'OUTPUT' ]
-
-- name: save rules iptables
-  shell: /sbin/iptables-save  > /etc/sysconfig/iptables
-
-- name: Ensure SELinux is set to disabled mode
-  lineinfile:
-    path: /etc/selinux/config
-    regexp: '^SELINUX='
-    line: SELINUX=disabled
-
-- name: apply turn off selinux without reboot
-  shell: setenforce 0
-
+- name: prepare host before task
+  include_task: prepare.yml
 
 - name: install mariadb and dependecy
   yum:
@@ -36,30 +17,11 @@
       - mariadb 
       - mariadb-server 
       - net-tools
-      - python
-      - python-pip
-      - MySQL-python
+ 
     state: latest
 
-- name: pip upgrade
-  shell: pip install --upgrade pip
-
-#- name: install MySQLdb
-#  shell: pip install  --user  MySQLdb
-
-#- name: install  PyMySQL
-#  shell: pip3 install  --user PyMySQL 
-#- pip:
-#    name:  PyMySQL
-#    executable: pip-3.3
-- name: disable strict sql
-  blockinfile:
-    path: /etc/mysql/conf.d/disable_strict_mode.cnf
-    block: |
-      [mysqld]
-      sql_mode=IGNORE_SPACE,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
-    create: yes
-  notify: restart mariadb
+- name: install Python and dependensy
+  include_task: install-py-depend.yml
 
 - name: start mariadb
   service:
@@ -88,15 +50,19 @@
     name: "{{ dbuser }}"
     host: "%"
     password: "{{ dbpass }}"
-    priv: '*.*:ALL'
+    priv: '{{ dbname }}.*:ALL'
     state: present
 
 - name: Create database user  with name 'dppdo@localhost' and VAULT password  with all database privileges
   mysql_user:
     name: "{{ dbuser }}"
     password: "{{ dbpass }}"
-    priv: '*.*:ALL'
+    priv: '{{ dbname }}.*:ALL'
     state: present
+
+- name: apply iptables rules for base_db
+  include_task: iptables-rules-db.yml
+
 
 
                       

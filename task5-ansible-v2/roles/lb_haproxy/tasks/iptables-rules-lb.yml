@@ -1,0 +1,15 @@
+---
+- iptables_raw:
+    name: allow_tcp_80
+    rules: '-A INPUT -p tcp -m tcp --dport 80 -j ACCEPT'
+    
+- iptables_raw:
+    name: allow_tcp_443
+    rules: '-A INPUT -p tcp -m tcp --dport 443 -j ACCEPT'
+  
+- iptables_raw:
+    name: allow_tcp_22
+    rules: '-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT'
+
+    
+
