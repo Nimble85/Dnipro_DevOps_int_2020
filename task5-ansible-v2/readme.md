@@ -28,9 +28,10 @@ Steps:
   3. Apply role base_db
      3.1 Proconfiguring host 
      3.2 install  mariadb and dependecy
-     3.3 Copy database dump file
-     3.4 Restore database
-     3.5 Create database user with vault pass
+     3.3 run mariadb
+     3.4 Copy database dump file
+     3.5 Restore database
+     3.6 Create database user with vault pass
 ```
 For run
 ## ansible-playbook main.yml --ask-vault-pass
