@@ -58,14 +58,23 @@ defaults
   skip
   ////////
 frontend  www
-    bind {{ ip_ext_lb }}:{{ port_ext_lb }}
+    bind {{ hostvars['loadbalancer'].ansible_host }}:{{ port_ext_lb }}
     default_backend nginx_pool
 
 backend nginx_pool
     balance     {{ balance_method }}
     mode http
-    server  web1 {{ ip_nginx_1 }}:{{ port_nginx_1 }} check
-    server  web2 {{ ip_nginx_2 }}:{{ port_nginx_2 }} check
+    server  web1 {{ hostvars['web1'].ansible_host }}:{{ port_nginx_1 }} check
+    server  web2 {{ hostvars['web1'].ansible_host }}:{{ port_nginx_2 }} check
+
+## HTTPs section
+listen https-proxy {{ hostvars['loadbalancer'].ansible_host }}:443
+mode tcp
+balance source
+option httpclose
+option forwardfor
+server web1 {{ hostvars['web1'].ansible_host }}:443 check port 443
+server web2 {{ hostvars['web2'].ansible_host }}:443 check port 443
 
 ```
 ### roles/lb_haproxy/tasks/main.yml

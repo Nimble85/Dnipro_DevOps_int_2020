@@ -51,22 +51,23 @@ defaults
 #    use_backend static          if url_static
 #    default_backend             app
 frontend  www
-    bind {{ ip_ext_lb }}:{{ port_ext_lb }}
+    bind {{ hostvars['loadbalancer'].ansible_host }}:{{ port_ext_lb }}
     default_backend nginx_pool
 
-
-
-#---------------------------------------------------------------------
-# static backend for serving up images, stylesheets and such
-#---------------------------------------------------------------------
-#backend static
-#    balance     roundrobin
-#    server      static 127.0.0.1:4331 check
 backend nginx_pool
     balance     {{ balance_method }}
     mode http
-    server  web1 {{ ip_nginx_1 }}:{{ port_nginx_1 }} check
-    server  web2 {{ ip_nginx_2 }}:{{ port_nginx_2 }} check
+    server  web1 {{ hostvars['web1'].ansible_host }}:{{ port_nginx_1 }} check
+    server  web2 {{ hostvars['web1'].ansible_host }}:{{ port_nginx_2 }} check
+
+## HTTPs section
+listen https-proxy {{ hostvars['loadbalancer'].ansible_host }}:443
+mode tcp
+balance source
+option httpclose
+option forwardfor
+server web1 {{ hostvars['web1'].ansible_host }}:443 check port 443
+server web2 {{ hostvars['web2'].ansible_host }}:443 check port 443
 
 #---------------------------------------------------------------------
 # round robin balancing between the various backends
