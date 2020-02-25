@@ -1,0 +1,9 @@
+---
+- name: install php and dependency 
+  yum:
+    name:
+        - php-fpm 
+        - php-common
+        - php
+        - php-cli 
+        - php-mysql 

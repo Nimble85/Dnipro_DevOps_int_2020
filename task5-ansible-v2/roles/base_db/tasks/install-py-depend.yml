@@ -1,0 +1,7 @@
+---
+- name: install Python and module for mysql_db mysql_user
+  yum:
+    name:
+      - python
+      - python-pip
+      - MySQL-python     
