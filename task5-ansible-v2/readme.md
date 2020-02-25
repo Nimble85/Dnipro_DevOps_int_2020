@@ -3,10 +3,10 @@
 
 ## Solution
 
-Solution for task will bу realisen in local enveronment virtualbox VM.
+Solution for task will bу realised in local enveronment virtualbox VM.
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task5-ansible-v2/screenshot/pic1_1.png  )
 
-### As base application wil be use "CRUD Sample: PHP, Bootstrap and MySQL" from GitHub     
+### As base application will be use "CRUD Sample: PHP, Bootstrap and MySQL" from GitHub     
 https://github.com/medaimane/crud-php-pdo-bootstrap-mysql
 ```
 Steps:
