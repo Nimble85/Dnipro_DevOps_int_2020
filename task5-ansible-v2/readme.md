@@ -50,6 +50,31 @@ results:
 
 
 Review key-files:
+# ./main.yml
+```
+---
+ - name: apply roles for loadbalancer
+  hosts: LB
+  become: yes
+ 
+  roles:
+  - { role: lb_haproxy, when: ansible_system == 'Linux' }  
+
+- name: apply roles for webservers
+  hosts: WEB
+  become: yes
+
+  roles:
+  - { role: web_nginx, when: ansible_system == 'Linux' }
+
+- name: apply roles for databases
+  hosts: DB
+  become: yes
+
+  roles:
+  - { role: base_db, when: ansible_system == 'Linux' }
+```
+
 ### haproxy.cfg.j2 
 
 ```
