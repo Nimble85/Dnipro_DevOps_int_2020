@@ -86,9 +86,6 @@ server web2 {{ hostvars['web2'].ansible_host }}:443 check port 443
 ---
 # tasks file for loadbalancer
 
-- name: check linux distro
-  debug: var=ansible_os_family
-
 - name: prepare host before task
   include_task: prepare.yml
 
@@ -117,9 +114,6 @@ server web2 {{ hostvars['web2'].ansible_host }}:443 check port 443
 ```
 ---
 # tasks file for web
-
-- name: check linux distro
-  debug: var=ansible_os_family
 
 - name: prepare host before task
   include_task: prepare.yml
@@ -239,9 +233,6 @@ server web2 {{ hostvars['web2'].ansible_host }}:443 check port 443
 ### roles/base_db/tasks/main.yml
 ``` 
 ---
-# tasks file for base_db
-- name: check linux distro
-  debug: var=ansible_os_family
 
 - name: prepare host before task
   include_task: prepare.yml

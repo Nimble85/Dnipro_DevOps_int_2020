@@ -1,8 +1,8 @@
 ---
 # tasks file for loadbalancer
 
-- name: check linux distro
-  debug: var=ansible_os_family
+#- name: check linux distro
+#  debug: var=ansible_os_family
 
 - name: prepare host before task
   include_task: prepare.yml

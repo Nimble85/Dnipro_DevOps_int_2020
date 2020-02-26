@@ -1,8 +1,8 @@
 ---
 # tasks file for web
 
-- name: check linux distro
-  debug: var=ansible_os_family
+#- name: check linux distro
+#  debug: var=ansible_os_family
 
 #- name: update all packages
 #  yum:
