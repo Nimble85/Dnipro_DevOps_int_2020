@@ -20,11 +20,6 @@
 
     
 
-- name: reload nginx
-  service: 
-    name : nginx
-    state: reloaded
-
 - name:  reload php-fpm
   service:
     name : php-fpm
