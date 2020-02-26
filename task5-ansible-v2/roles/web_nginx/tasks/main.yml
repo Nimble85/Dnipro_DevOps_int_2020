@@ -92,30 +92,26 @@
       enabled: yes
 
 - name: test services
-  command: systemctl status {{ item }}
-  with_items:
-    - php-fpm
+  command: systemctl status php-fpm
   register: service_status_php_fpm
 - debug: 
     var: service_status_php_fpm 
 
 - name: test services
-  command: systemctl status {{ item }}
-  with_items:
-    - nginx
+  command: systemctl status nginx
   register: service_status_nginx
 - debug: 
     var: service_status_nginx
 
 
-- name: check sock
-  shell: ls -l /var/run/php-fpm/php-fpm.sock 
-  register: sock_info
-- debug:
-    var: sock_info
+#- name: check sock
+#  shell: ls -l /var/run/php-fpm/php-fpm.sock 
+#  register: sock_info
+#- debug:
+#    var: sock_info
 
 - name: check services open ports
-  shell: netstat -tlpn
+  command: netstat -tlpn
   register: netstat_result
 
 - debug:
