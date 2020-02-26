@@ -189,8 +189,10 @@ server web2 {{ hostvars['web2'].ansible_host }}:443 check port 443
   copy: src=ssl/nginx-selfsigned.key dest=/etc/ssl/private/nginx-selfsigned.key
   notify: reload nginx
 
-- name: copy dhparam.pem to /etc/ssl/certs/
-  copy: src=ssl/dhparam.pem  dest=/etc/ssl/certs/dhparam.pem
+- name: Generate DH Parameters with a different size (2048 bits)
+  openssl_dhparam:
+    path: /etc/ssl/certs/dhparam.pem
+    size: 2048
   notify: reload nginx
 
 - name: copy nginx-selfsigned.crt to /etc/ssl/certs/
