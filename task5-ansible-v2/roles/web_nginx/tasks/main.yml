@@ -9,7 +9,7 @@
 #    name: '*'
 #    state: latest
 - name: prepare host before task
-  include_task: prepare.yml
+  import_tasks: prepare.yml
   
 - name: Install Nginx
   yum:
@@ -18,7 +18,7 @@
     state: latest
     
 - name: install php and dependency
-  include_task: install-php-dep.yml
+  import_tasks: install-php-dep.yml
 
 - name: create folder /var/www/project.local
   file:
@@ -61,7 +61,7 @@
   openssl_dhparam:
     path: /etc/ssl/certs/dhparam.pem
     size: 2048
-    notify: reload nginx
+    
 
 #- name: copy dhparam.pem to /etc/ssl/certs/
 #  copy: src=ssl/dhparam.pem  dest=/etc/ssl/certs/dhparam.pem
@@ -123,6 +123,5 @@
 - debug:
     var: netstat_result
  
-- name: apply iptables rules for webservers
-  include_task: iptables-rules-web.yml
+
               

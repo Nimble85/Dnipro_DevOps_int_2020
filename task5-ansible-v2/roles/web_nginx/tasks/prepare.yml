@@ -1,16 +1,15 @@
----
-- name: disable firewalld
-  service:
-    name: firewalld
-    state: stopped
-    enabled: no
-    
 - name: iptables flush filter
   iptables:
     chain: "{{ item }}"
     flush: yes
   with_items:  [ 'INPUT', 'FORWARD', 'OUTPUT' ]
 
+- name: disable firewalld
+  service:
+    name: firewalld
+    state: stopped
+    enabled: no
+    
 - name: Ensure SELinux is set to disabled mode
   lineinfile:
     path: /etc/selinux/config

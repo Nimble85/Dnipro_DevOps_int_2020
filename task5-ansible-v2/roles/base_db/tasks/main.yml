@@ -9,7 +9,7 @@
 #    state: latest
 
 - name: prepare host before task
-  include_task: prepare.yml
+  import_task: prepare.yml
 
 - name: install mariadb and dependecy
   yum:
@@ -21,7 +21,7 @@
     state: latest
 
 - name: install Python and dependensy
-  include_task: install-py-depend.yml
+  import_tasks: install-py-depend.yml
 
 - name: start mariadb
   service:
@@ -64,8 +64,6 @@
 
 
 
-- name: apply iptables rules for base_db
-  include_task: iptables-rules-db.yml
 
 
 
