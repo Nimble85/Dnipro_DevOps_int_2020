@@ -310,7 +310,7 @@ sudo chown nginx:nginx -R /usr/share/nginx/html/
 sudo systemctl enable nginx
 sudo systemctl start nginx
 ```
-### Results of "terraform apply"
+### Results of terraform apply
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terrasoft-v1/screenshot/pic1.png
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terrasoft-v1/screenshot/pic2.png
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terrasoft-v1/screenshot/pic3.png
