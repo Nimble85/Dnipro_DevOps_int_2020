@@ -321,8 +321,10 @@ sudo systemctl start nginx
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic8.png)      
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic9.png)     
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic10.png)     
-![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic11.png)     
-![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic12.png)     
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic11.png) 
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic12.png) 
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic13.png)     
+    
 
 # terraform plan
 ```
