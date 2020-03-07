@@ -38,7 +38,7 @@ Steps of solution:
    - enable nginx and start.
 18. Result - in subnet  "eu-central-1a-public" runing web server with a personal web site
 
-# 1. Created IAM policy "S3ReadOnly"
+### 1. Created IAM policy "S3ReadOnly"
 create_iam_policy.tf
 ```
 resource "aws_iam_policy" "s3_read_policy" {
@@ -61,7 +61,7 @@ policys3bucket.json
 }
 ```
 
-# 2. Created IAM instancew profile
+### 2. Created IAM instancew profile
 createiamprofile.tf
 ```
 resource "aws_iam_instance_profile" "s3_read_profile" {
@@ -70,7 +70,7 @@ resource "aws_iam_instance_profile" "s3_read_profile" {
 }
 ```
 
-# 3. Created IAM role "s3_read_role"
+### 3. Created IAM role "s3_read_role"
 createiamrole.tf
 ```
 resource "aws_iam_role" "ec2_s3_access_role" {
@@ -93,7 +93,7 @@ assumerolepolicy.json
    }
  ]
 ```
-# 4. Attached policy "S3ReadOnly" to role "s3_read_role"
+### 4. Attached policy "S3ReadOnly" to role "s3_read_role"
 attaching_policy_and_role.tf
 ```
 resource "aws_iam_policy_attachment" "attach_s3_read" {
@@ -213,7 +213,7 @@ resource "aws_route_table_association" "eu-central-1a-public-second" {
   route_table_id = aws_route_table.eu-central-1a-public-second.id
 }
 ```
-# 13. Created peering connection between VPC "Default" and VPC  "Second"
+### 13. Created peering connection between VPC "Default" and VPC  "Second"
 peering_connection.tf
 ```
 resource "aws_vpc_peering_connection" "bridge" {
@@ -221,7 +221,7 @@ resource "aws_vpc_peering_connection" "bridge" {
   vpc_id        = aws_vpc.second.id
 }
 ```
-# 14. Created ACL and attach it to subnet "eu-central-1a-public"
+### 14. Created ACL and attach it to subnet "eu-central-1a-public"
 acl.tf
 ```
 resource "aws_network_acl" "dmz-1" {
@@ -248,7 +248,7 @@ resource "aws_network_acl" "dmz-1" {
   }
 }
 ```
-# 15. Created Security group  "my_web" for VPC "Default"
+### 15. Created Security group  "my_web" for VPC "Default"
 aws_security_group.tf
 ```
 resource "aws_security_group" "my_web" {
@@ -277,7 +277,7 @@ resource "aws_security_group" "my_web" {
   }
 }
 ```
-# 16. Launched EC2 instanse in "eu-central-1a-public" subnet and attached to instanse:
+### 16. Launched EC2 instanse in "eu-central-1a-public" subnet and attached to instanse:
 create_ec2_instance.tf
 ```
 provider "aws" {
@@ -299,7 +299,7 @@ resource "aws_instance" "nginx_task_aws" {
   user_data = file("user_data.sh")
 }
 ```
-# 17. During instanse runing script does:
+### 17. During instanse runing script does:
 user_data.sh
 ```
 #!/bin/bash
@@ -310,7 +310,7 @@ sudo chown nginx:nginx -R /usr/share/nginx/html/
 sudo systemctl enable nginx
 sudo systemctl start nginx
 ```
-# Results of "terraform apply"
+### Results of "terraform apply"
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terrasoft-v1/screenshot/pic1.png
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terrasoft-v1/screenshot/pic2.png
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terrasoft-v1/screenshot/pic3.png
