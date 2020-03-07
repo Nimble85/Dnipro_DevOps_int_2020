@@ -310,19 +310,19 @@ sudo chown nginx:nginx -R /usr/share/nginx/html/
 sudo systemctl enable nginx
 sudo systemctl start nginx
 ```
-### Results of terraform apply
-![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terrasoft-v1/screenshot/pic1.png)   
-![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terrasoft-v1/screenshot/pic2.png)   
-![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terrasoft-v1/screenshot/pic3.png)     
-![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terrasoft-v1/screenshot/pic4.png)    
-![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terrasoft-v1/screenshot/pic5.png)    
-![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terrasoft-v1/screenshot/pic6.png)     
-![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terrasoft-v1/screenshot/pic7.png)      
-![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terrasoft-v1/screenshot/pic8.png)      
-![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terrasoft-v1/screenshot/pic9.png)     
-![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terrasoft-v1/screenshot/pic10.png)     
-![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terrasoft-v1/screenshot/pic11.png)     
-![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terrasoft-v1/screenshot/pic12.png)     
+### Results of "terraform apply"
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic1.png)   
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic2.png)   
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic3.png)     
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic4.png)    
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic5.png)    
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic6.png)     
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic7.png)      
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic8.png)      
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic9.png)     
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic10.png)     
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic11.png)     
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic12.png)     
 
 # terraform plan
 ```
