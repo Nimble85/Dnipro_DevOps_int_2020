@@ -102,14 +102,14 @@ resource "aws_iam_policy_attachment" "attach_s3_read" {
   policy_arn = aws_iam_policy.s3_read_policy.arn
 }
 ```
-**5. Created VPC "Default" cidr_block="10.0.0.0/16" and VPC "Second" cidr_block="192.168.0.0/16" in eu-central-1a AZ**
-**6. Created subnet "eu-central-1a-public" cidr_block="10.0.1.0/24" in VPC "Default"**
-**7. Created subnet "eu-central-1a-private" cidr_block="10.0.2.0/24" in VPC "Default"**
-**8. Created subnet "eu-central-1a-public-second" cidr_block="192.168.1.0/24" in VPC  "Second"**
-**9. Created IGW for VPC "Default" and IGW for  VPC "Second"**
-**10. Attached IGW for each VPS**
-**11. Created route tables for subnets "eu-central-1a-public" and "eu-central-1a-public-second"**
-**12. Assotiated route tables with both subnets.**
+**5. Created VPC "Default" cidr_block="10.0.0.0/16" and VPC "Second" cidr_block="192.168.0.0/16" in eu-central-1a AZ**    
+**6. Created subnet "eu-central-1a-public" cidr_block="10.0.1.0/24" in VPC "Default"**     
+**7. Created subnet "eu-central-1a-private" cidr_block="10.0.2.0/24" in VPC "Default"**       
+**8. Created subnet "eu-central-1a-public-second" cidr_block="192.168.1.0/24" in VPC  "Second"**      
+**9. Created IGW for VPC "Default" and IGW for  VPC "Second"**     
+**10. Attached IGW for each VPS**      
+**11. Created route tables for subnets "eu-central-1a-public" and "eu-central-1a-public-second"**     
+**12. Assotiated route tables with both subnets.**     
 create_vpc_and_subnets.tf
 ```
 resource "aws_vpc" "default" {
