@@ -30,7 +30,7 @@ Steps of solution:
    - IAM role "s3_read_role"
    - Security group  "my_web"
    - user_data scripts user_data.sh
-17. During instanse runing script does:
+17. While instanse runing, script does:
    - Update yum
    - Install nginx
    - Via AWS Cli syncing s3 backet "fenixra-site" to root folder Nginx /usr/share/nginx/html/
@@ -299,7 +299,7 @@ resource "aws_instance" "nginx_task_aws" {
   user_data = file("user_data.sh")
 }
 ```
-### 17. During instanse runing script does:
+### 17. While instanse runing, script does:
 user_data.sh
 ```
 #!/bin/bash
