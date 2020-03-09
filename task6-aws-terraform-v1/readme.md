@@ -415,6 +415,9 @@ sudo systemctl start nginx
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic13.png)  
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic14.png)
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic15.png)   
+
+### terraform destroy 
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic16.png) 
     
 
 # terraform plan
