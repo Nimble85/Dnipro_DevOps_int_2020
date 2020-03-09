@@ -506,14 +506,177 @@ Terraform will perform the following actions:
       + unique_id             = (known after apply)
     }
 
-  # aws_instance.nginx_task_aws will be created
-  + resource "aws_instance" "nginx_task_aws" {
+  # aws_instance.linux_task_aws will be created
+  + resource "aws_instance" "linux_task_aws" {
       + ami                          = "ami-0d4c3eabb9e72650a"
+      + arn                          = (known after apply)
+      + associate_public_ip_address  = true
+      + availability_zone            = (known after apply)
+      + cpu_core_count               = (known after apply)
+      + cpu_threads_per_core         = (known after apply)
       + get_password_data            = false
       + host_id                      = (known after apply)
       + iam_instance_profile         = "s3_onlyread_profile"
+      + id                           = (known after apply)
+      + instance_state               = (known after apply)
       + instance_type                = "t2.micro"
+      + ipv6_address_count           = (known after apply)
+      + ipv6_addresses               = (known after apply)
       + key_name                     = "jenkins"
+      + network_interface_id         = (known after apply)
+      + password_data                = (known after apply)
+      + placement_group              = (known after apply)
+      + primary_network_interface_id = (known after apply)
+      + private_dns                  = (known after apply)
+      + private_ip                   = (known after apply)
+      + public_dns                   = (known after apply)
+      + public_ip                    = (known after apply)
+      + security_groups              = (known after apply)
+      + source_dest_check            = true
+      + subnet_id                    = (known after apply)
+      + tags                         = {
+          + "Name"    = "linux"
+          + "Owner"   = "Kozulenko Volodymyr"
+          + "Project" = "Terraform AWS task6"
+        }
+      + tenancy                      = (known after apply)
+      + volume_tags                  = (known after apply)
+      + vpc_security_group_ids       = (known after apply)
+
+      + ebs_block_device {
+          + delete_on_termination = (known after apply)
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + snapshot_id           = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = (known after apply)
+          + volume_type           = (known after apply)
+        }
+
+      + ephemeral_block_device {
+          + device_name  = (known after apply)
+          + no_device    = (known after apply)
+          + virtual_name = (known after apply)
+        }
+
+      + network_interface {
+          + delete_on_termination = (known after apply)
+          + device_index          = (known after apply)
+          + network_interface_id  = (known after apply)
+        }
+
+      + root_block_device {
+          + delete_on_termination = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = (known after apply)
+          + volume_type           = (known after apply)
+        }
+    }
+
+  # aws_instance.nginx2_task_aws will be created
+  + resource "aws_instance" "nginx2_task_aws" {
+      + ami                          = "ami-0d4c3eabb9e72650a"
+      + arn                          = (known after apply)
+      + associate_public_ip_address  = true
+      + availability_zone            = (known after apply)
+      + cpu_core_count               = (known after apply)
+      + cpu_threads_per_core         = (known after apply)
+      + get_password_data            = false
+      + host_id                      = (known after apply)
+      + iam_instance_profile         = "s3_onlyread_profile"
+      + id                           = (known after apply)
+      + instance_state               = (known after apply)
+      + instance_type                = "t2.micro"
+      + ipv6_address_count           = (known after apply)
+      + ipv6_addresses               = (known after apply)
+      + key_name                     = "jenkins"
+      + network_interface_id         = (known after apply)
+      + password_data                = (known after apply)
+      + placement_group              = (known after apply)
+      + primary_network_interface_id = (known after apply)
+      + private_dns                  = (known after apply)
+      + private_ip                   = (known after apply)
+      + public_dns                   = (known after apply)
+      + public_ip                    = (known after apply)
+      + security_groups              = (known after apply)
+      + source_dest_check            = true
+      + subnet_id                    = (known after apply)
+      + tags                         = {
+          + "Name"    = "Nginx2"
+          + "Owner"   = "Kozulenko Volodymyr"
+          + "Project" = "Terraform AWS task6"
+        }
+      + tenancy                      = (known after apply)
+      + user_data                    = "ccf50fa1ed669f459416f95a06336d729ccfc265"
+      + volume_tags                  = (known after apply)
+      + vpc_security_group_ids       = (known after apply)
+
+      + ebs_block_device {
+          + delete_on_termination = (known after apply)
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + snapshot_id           = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = (known after apply)
+          + volume_type           = (known after apply)
+        }
+
+      + ephemeral_block_device {
+          + device_name  = (known after apply)
+          + no_device    = (known after apply)
+          + virtual_name = (known after apply)
+        }
+
+      + network_interface {
+          + delete_on_termination = (known after apply)
+          + device_index          = (known after apply)
+          + network_interface_id  = (known after apply)
+        }
+
+      + root_block_device {
+          + delete_on_termination = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = (known after apply)
+          + volume_type           = (known after apply)
+        }
+    }
+
+  # aws_instance.nginx_task_aws will be created
+  + resource "aws_instance" "nginx_task_aws" {
+      + ami                          = "ami-0d4c3eabb9e72650a"
+      + arn                          = (known after apply)
+      + associate_public_ip_address  = true
+      + availability_zone            = (known after apply)
+      + cpu_core_count               = (known after apply)
+      + cpu_threads_per_core         = (known after apply)
+      + get_password_data            = false
+      + host_id                      = (known after apply)
+      + iam_instance_profile         = "s3_onlyread_profile"
+      + id                           = (known after apply)
+      + instance_state               = (known after apply)
+      + instance_type                = "t2.micro"
+      + ipv6_address_count           = (known after apply)
+      + ipv6_addresses               = (known after apply)
+      + key_name                     = "jenkins"
+      + network_interface_id         = (known after apply)
+      + password_data                = (known after apply)
+      + placement_group              = (known after apply)
+      + primary_network_interface_id = (known after apply)
+      + private_dns                  = (known after apply)
+      + private_ip                   = (known after apply)
+      + public_dns                   = (known after apply)
+      + public_ip                    = (known after apply)
+      + security_groups              = (known after apply)
       + source_dest_check            = true
       + subnet_id                    = (known after apply)
       + tags                         = {
@@ -522,16 +685,52 @@ Terraform will perform the following actions:
           + "Project" = "Terraform AWS task6"
         }
       + tenancy                      = (known after apply)
-      + user_data                    = "89b0f197afdb4266bbf6cb7c0ba2c2433805cc04"
+      + user_data                    = "ccf50fa1ed669f459416f95a06336d729ccfc265"
       + volume_tags                  = (known after apply)
       + vpc_security_group_ids       = (known after apply)
 
+      + ebs_block_device {
+          + delete_on_termination = (known after apply)
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + snapshot_id           = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = (known after apply)
+          + volume_type           = (known after apply)
+        }
 
+      + ephemeral_block_device {
+          + device_name  = (known after apply)
+          + no_device    = (known after apply)
+          + virtual_name = (known after apply)
+        }
+
+      + network_interface {
+          + delete_on_termination = (known after apply)
+          + device_index          = (known after apply)
+          + network_interface_id  = (known after apply)
+        }
+
+      + root_block_device {
+          + delete_on_termination = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = (known after apply)
+          + volume_type           = (known after apply)
+        }
+    }
 
   # aws_internet_gateway.default will be created
   + resource "aws_internet_gateway" "default" {
       + id       = (known after apply)
       + owner_id = (known after apply)
+      + tags     = {
+          + "Name" = "IGW for public subnet ,default VPC"
+        }
       + vpc_id   = (known after apply)
     }
 
@@ -539,6 +738,9 @@ Terraform will perform the following actions:
   + resource "aws_internet_gateway" "second" {
       + id       = (known after apply)
       + owner_id = (known after apply)
+      + tags     = {
+          + "Name" = "IGW for public subnet , second  VPC"
+        }
       + vpc_id   = (known after apply)
     }
 
@@ -561,7 +763,7 @@ Terraform will perform the following actions:
       + ingress    = [
           + {
               + action          = "allow"
-              + cidr_block      = "10.0.0.0/16"
+              + cidr_block      = "0.0.0.0/0"
               + from_port       = 0
               + icmp_code       = null
               + icmp_type       = null
@@ -572,9 +774,35 @@ Terraform will perform the following actions:
             },
         ]
       + owner_id   = (known after apply)
-      + subnet_id  = (known after apply)
       + subnet_ids = (known after apply)
+      + tags       = {
+          + "Name" = "ACL for public default"
+        }
       + vpc_id     = (known after apply)
+    }
+
+  # aws_route_table.eu-central-1a-private will be created
+  + resource "aws_route_table" "eu-central-1a-private" {
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + route            = [
+          + {
+              + cidr_block                = "192.168.1.0/24"
+              + egress_only_gateway_id    = ""
+              + gateway_id                = (known after apply)
+              + instance_id               = ""
+              + ipv6_cidr_block           = ""
+              + nat_gateway_id            = ""
+              + network_interface_id      = ""
+              + transit_gateway_id        = ""
+              + vpc_peering_connection_id = ""
+            },
+        ]
+      + tags             = {
+          + "Name" = "Routetable Private Subnet"
+        }
+      + vpc_id           = (known after apply)
     }
 
   # aws_route_table.eu-central-1a-public will be created
@@ -585,6 +813,17 @@ Terraform will perform the following actions:
       + route            = [
           + {
               + cidr_block                = "0.0.0.0/0"
+              + egress_only_gateway_id    = ""
+              + gateway_id                = (known after apply)
+              + instance_id               = ""
+              + ipv6_cidr_block           = ""
+              + nat_gateway_id            = ""
+              + network_interface_id      = ""
+              + transit_gateway_id        = ""
+              + vpc_peering_connection_id = ""
+            },
+          + {
+              + cidr_block                = "192.168.1.0/24"
               + egress_only_gateway_id    = ""
               + gateway_id                = (known after apply)
               + instance_id               = ""
@@ -618,11 +857,29 @@ Terraform will perform the following actions:
               + transit_gateway_id        = ""
               + vpc_peering_connection_id = ""
             },
+          + {
+              + cidr_block                = "10.0.1.0/24"
+              + egress_only_gateway_id    = ""
+              + gateway_id                = (known after apply)
+              + instance_id               = ""
+              + ipv6_cidr_block           = ""
+              + nat_gateway_id            = ""
+              + network_interface_id      = ""
+              + transit_gateway_id        = ""
+              + vpc_peering_connection_id = ""
+            },
         ]
       + tags             = {
           + "Name" = "Second Route table Public Subnet for second VPC"
         }
       + vpc_id           = (known after apply)
+    }
+
+  # aws_route_table_association.eu-central-1a-private will be created
+  + resource "aws_route_table_association" "eu-central-1a-private" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
     }
 
   # aws_route_table_association.eu-central-1a-public will be created
@@ -665,6 +922,19 @@ Terraform will perform the following actions:
                   + "0.0.0.0/0",
                 ]
               + description      = ""
+              + from_port        = -1
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "icmp"
+              + security_groups  = []
+              + self             = false
+              + to_port          = -1
+            },
+          + {
+              + cidr_blocks      = [
+                  + "0.0.0.0/0",
+                ]
+              + description      = ""
               + from_port        = 22
               + ipv6_cidr_blocks = []
               + prefix_list_ids  = []
@@ -701,6 +971,90 @@ Terraform will perform the following actions:
             },
         ]
       + name                   = "Security Group for AWS task6"
+      + owner_id               = (known after apply)
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Name"  = "Security Group for AWS task6"
+          + "Owner" = "Kozulenko Volodymyr"
+        }
+      + vpc_id                 = (known after apply)
+    }
+
+  # aws_security_group.my_web2 will be created
+  + resource "aws_security_group" "my_web2" {
+      + arn                    = (known after apply)
+      + description            = "SG 2 for AWS task6"
+      + egress                 = [
+          + {
+              + cidr_blocks      = [
+                  + "0.0.0.0/0",
+                ]
+              + description      = ""
+              + from_port        = 0
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "-1"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 0
+            },
+        ]
+      + id                     = (known after apply)
+      + ingress                = [
+          + {
+              + cidr_blocks      = [
+                  + "0.0.0.0/0",
+                ]
+              + description      = ""
+              + from_port        = -1
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "icmp"
+              + security_groups  = []
+              + self             = false
+              + to_port          = -1
+            },
+          + {
+              + cidr_blocks      = [
+                  + "0.0.0.0/0",
+                ]
+              + description      = ""
+              + from_port        = 22
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "tcp"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 22
+            },
+          + {
+              + cidr_blocks      = [
+                  + "0.0.0.0/0",
+                ]
+              + description      = ""
+              + from_port        = 443
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "tcp"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 443
+            },
+          + {
+              + cidr_blocks      = [
+                  + "0.0.0.0/0",
+                ]
+              + description      = ""
+              + from_port        = 80
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "tcp"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 80
+            },
+        ]
+      + name                   = "Security Group 2 for AWS task6"
       + owner_id               = (known after apply)
       + revoke_rules_on_delete = false
       + tags                   = {
@@ -753,6 +1107,9 @@ Terraform will perform the following actions:
       + availability_zone               = "eu-central-1a"
       + availability_zone_id            = (known after apply)
       + cidr_block                      = "192.168.1.0/24"
+      + id                              = (known after apply)
+      + ipv6_cidr_block                 = (known after apply)
+      + ipv6_cidr_block_association_id  = (known after apply)
       + map_public_ip_on_launch         = false
       + owner_id                        = (known after apply)
       + tags                            = {
@@ -766,9 +1123,20 @@ Terraform will perform the following actions:
       + arn                              = (known after apply)
       + assign_generated_ipv6_cidr_block = false
       + cidr_block                       = "10.0.0.0/16"
+      + default_network_acl_id           = (known after apply)
+      + default_route_table_id           = (known after apply)
+      + default_security_group_id        = (known after apply)
+      + dhcp_options_id                  = (known after apply)
+      + enable_classiclink               = (known after apply)
+      + enable_classiclink_dns_support   = (known after apply)
+      + enable_dns_hostnames             = (known after apply)
       + enable_dns_support               = true
       + id                               = (known after apply)
       + instance_tenancy                 = "default"
+      + ipv6_association_id              = (known after apply)
+      + ipv6_cidr_block                  = (known after apply)
+      + main_route_table_id              = (known after apply)
+      + owner_id                         = (known after apply)
       + tags                             = {
           + "Name" = "main_vpc"
         }
@@ -779,9 +1147,15 @@ Terraform will perform the following actions:
       + arn                              = (known after apply)
       + assign_generated_ipv6_cidr_block = false
       + cidr_block                       = "192.168.0.0/16"
+
+      + enable_dns_hostnames             = (known after apply)
       + enable_dns_support               = true
       + id                               = (known after apply)
       + instance_tenancy                 = "default"
+      + ipv6_association_id              = (known after apply)
+      + ipv6_cidr_block                  = (known after apply)
+      + main_route_table_id              = (known after apply)
+      + owner_id                         = (known after apply)
       + tags                             = {
           + "Name" = "second_vpc"
         }
@@ -809,8 +1183,9 @@ Terraform will perform the following actions:
         }
     }
 
-Plan: 19 to add, 0 to change, 0 to destroy.
+Plan: 24 to add, 0 to change, 0 to destroy.
 
 ------------------------------------------------------------------------
+
 ```
 
