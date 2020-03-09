@@ -10,7 +10,7 @@ Homewok:
 # SOLUTION
 For solving task will be used Terraform.
 
-![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/diagrama.png) 
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/diagram.png) 
 
 Steps of solution:
 1. Created IAM policy "S3ReadOnly"
