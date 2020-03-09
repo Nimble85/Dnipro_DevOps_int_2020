@@ -10,6 +10,8 @@ Homewok:
 # SOLUTION
 For solving task will be used Terraform.
 
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/diagrama.png) 
+
 Steps of solution:
 1. Created IAM policy "S3ReadOnly"
 2. Created IAM instancew profile
@@ -21,22 +23,28 @@ Steps of solution:
 8. Created subnet "eu-central-1a-public-second" cidr_block="192.168.1.0/24" in VPC  "Second"
 9. Created IGW for VPC "Default" and IGW for  VPC "Second"
 10. Attached IGW for each VPS
-11. Created route tables for subnets "eu-central-1a-public" and "eu-central-1a-public-second"
-12. Assotiated route tables with both subnets.
+11. Created route tables for subnets "eu-central-1a-public","eu-central-1a-private" and "eu-central-1a-public-second"
+12. Assotiated route tables with subnets.
 13. Created peering connection between VPC "Default" and VPC  "Second"
 14. Created ACL and attach it to subnet "eu-central-1a-public"
-15. Created Security group  "my_web" for VPC "Default"
-16. Launched EC2 instanse in "eu-central-1a-public" subnet and attached to instanse:
+15. Created Security group  "my_web" for VPC "Default", "my_web2" for VPC "Second"
+16. Launched EC2 instanse named "Nginx" in "eu-central-1a-public" subnet and attached to instanse:
    - IAM role "s3_read_role"
    - Security group  "my_web"
    - user_data scripts user_data.sh
-17. While instanse runing, script does:
+    Launched EC2 instanse named "Linux" in "eu-central-1a-private" subnet
+    Launched EC2 instanse named "Nginx2" in "eu-central-1a-public-second" subnet and attached to instanse:
+   - IAM role "s3_read_role"
+   - Security group  "my_web2"
+   - user_data scripts user_data.sh
+17. While instanses runing, script does:
    - Update yum
    - Install nginx
    - Via AWS Cli syncing s3 backet "fenixra-site" to root folder Nginx /usr/share/nginx/html/
    - Maked chown for user nginx /usr/share/nginx/html/*
    - enable nginx and start.
 18. Result - in subnet  "eu-central-1a-public" runing web server with a personal web site
+19. Ping to subnets (check avalaibility)
 
 ### 1. Created IAM policy "S3ReadOnly"
 create_iam_policy.tf
@@ -118,15 +126,15 @@ resource "aws_vpc" "default" {
     Name = "main_vpc"
   }
 }
-/*
- add IGW (internet gateway)
-*/
+/* add IGW (internet gateway) */
 resource "aws_internet_gateway" "default" {
   vpc_id = aws_vpc.default.id
+  tags = {
+   Name = "IGW for public subnet ,default VPC"
+  }
 }
-/*
-  Public Subnet
-*/
+
+/*  Public Subnet */
 resource "aws_subnet" "eu-central-1a-public" {
   vpc_id = aws_vpc.default.id
   cidr_block = "10.0.1.0/24"
@@ -134,30 +142,30 @@ resource "aws_subnet" "eu-central-1a-public" {
   tags =  {
       Name = "Public Subnet"
   }
-}
-/*
-  create route table for public subnet
-*/
+
+/*   create route table for public subnet */
 resource "aws_route_table" "eu-central-1a-public" {
   vpc_id = aws_vpc.default.id
   route {
       cidr_block = "0.0.0.0/0"
       gateway_id = aws_internet_gateway.default.id
   }
+  route {
+      cidr_block = "192.168.1.0/24"
+      gateway_id = aws_vpc_peering_connection.bridge.id
+  }
   tags = {
       Name = "Public Subnet"
   }
 }
-/*
- assotiate route table with public subnet
-*/
+
+/* assotiate route table with public subnet */
 resource "aws_route_table_association" "eu-central-1a-public" {
   subnet_id = aws_subnet.eu-central-1a-public.id
   route_table_id = aws_route_table.eu-central-1a-public.id
 }
-/*
-  Private Subnet
-*/
+
+/*  Private Subnet */
 resource "aws_subnet" "eu-central-1a-private" {
   vpc_id = aws_vpc.default.id
   cidr_block = "10.0.2.0/24"
@@ -166,24 +174,43 @@ resource "aws_subnet" "eu-central-1a-private" {
       Name = "Private Subnet"
   }
 }
-/*
- Create second VPC
-*/
+
+/*   create route table for private  subnet */
+resource "aws_route_table" "eu-central-1a-private" {
+  vpc_id = aws_vpc.default.id
+  route {
+      cidr_block = "192.168.1.0/24"
+      gateway_id = aws_vpc_peering_connection.bridge.id
+   
+  }
+  tags = {
+      Name = "Routetable Private Subnet"
+  }
+}
+
+/* assotiate route table with private subnet */
+resource "aws_route_table_association" "eu-central-1a-private" {
+  subnet_id = aws_subnet.eu-central-1a-private.id
+  route_table_id = aws_route_table.eu-central-1a-private.id
+}
+
+/* Create second VPC */
 resource "aws_vpc" "second" {
   cidr_block       = "192.168.0.0/16"
   tags = {
     Name = "second_vpc"
   }
 }
-/*
- add IGW for second VPC (internet gateway)
-*/
+/* add IGW for second VPC (internet gateway) */
+
 resource "aws_internet_gateway" "second" {
   vpc_id = aws_vpc.second.id
+  tags = {
+    Name = "IGW for public subnet , second  VPC"
+  }
 }
-/*
-  Public Subnet second VPC
-*/
+
+/*  Public Subnet second VPC */
 resource "aws_subnet" "eu-central-1a-public-second" {
   vpc_id = aws_vpc.second.id
   cidr_block = "192.168.1.0/24"
@@ -192,33 +219,27 @@ resource "aws_subnet" "eu-central-1a-public-second" {
       Name = "Second Public Subnet in Second VPC"
   }
 }
-/*
-  create route table for public subnet in second VPC
-*/
+
+/*  create route table for public subnet in second VPC */
 resource "aws_route_table" "eu-central-1a-public-second" {
   vpc_id = aws_vpc.second.id
   route {
       cidr_block = "0.0.0.0/0"
       gateway_id = aws_internet_gateway.second.id
   }
+  route {
+      cidr_block = "10.0.1.0/24"
+      gateway_id = aws_vpc_peering_connection.bridge.id
+  }
   tags = {
       Name = "Second Route table Public Subnet for second VPC"
   }
 }
-/*
- assotiate route table with public subnet second VPC
-*/
+
+/* assotiate route table with public subnet second VPC */
 resource "aws_route_table_association" "eu-central-1a-public-second" {
   subnet_id = aws_subnet.eu-central-1a-public-second.id
   route_table_id = aws_route_table.eu-central-1a-public-second.id
-}
-```
-### 13. Created peering connection between VPC "Default" and VPC  "Second"
-peering_connection.tf
-```
-resource "aws_vpc_peering_connection" "bridge" {
-  peer_vpc_id   = aws_vpc.default.id
-  vpc_id        = aws_vpc.second.id
 }
 ```
 ### 14. Created ACL and attach it to subnet "eu-central-1a-public"
@@ -265,6 +286,12 @@ resource "aws_security_group" "my_web" {
       cidr_blocks = ["0.0.0.0/0"]
     }
   }
+  ingress {
+    from_port   = -1
+    to_port     = -1
+    protocol    = "icmp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   egress {
     from_port   = 0
     to_port     = 0
@@ -276,6 +303,37 @@ resource "aws_security_group" "my_web" {
     Owner = "Kozulenko Volodymyr"
   }
 }
+resource "aws_security_group" "my_web2" {
+  name        = "Security Group 2 for AWS task6"
+  description = "SG 2 for AWS task6"
+  vpc_id      = aws_vpc.second.id
+  dynamic "ingress" {
+    for_each = ["80", "22", "443"]
+    content {
+      from_port   = ingress.value
+      to_port     = ingress.value
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  }
+  ingress {
+    from_port   = -1
+    to_port     = -1
+    protocol    = "icmp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name  = "Security Group for AWS task6"
+    Owner = "Kozulenko Volodymyr"
+  }
+}
+
 ```
 ### 16. Launched EC2 instanse in "eu-central-1a-public" subnet and attached to instanse:
 create_ec2_instance.tf
@@ -283,6 +341,8 @@ create_ec2_instance.tf
 provider "aws" {
   region                 = "eu-central-1"
  }
+
+
 resource "aws_instance" "nginx_task_aws" {
   ami                    = "ami-0d4c3eabb9e72650a"
   instance_type          = "t2.micro"
@@ -298,6 +358,35 @@ resource "aws_instance" "nginx_task_aws" {
   }
   user_data = file("user_data.sh")
 }
+resource "aws_instance" "nginx2_task_aws" {
+  ami                    = "ami-0d4c3eabb9e72650a"
+  instance_type          = "t2.micro"
+  iam_instance_profile   = aws_iam_instance_profile.s3_read_profile.name
+  vpc_security_group_ids = [aws_security_group.my_web2.id]
+  subnet_id              = aws_subnet.eu-central-1a-public-second.id
+  associate_public_ip_address = true
+  key_name               = "jenkins"
+  tags = {
+    Name    = "Nginx2"
+    Owner   = "Kozulenko Volodymyr"
+    Project = "Terraform AWS task6"
+  }
+  user_data = file("user_data.sh")
+}
+resource "aws_instance" "linux_task_aws" {
+  ami                    = "ami-0d4c3eabb9e72650a"
+  instance_type          = "t2.micro"
+  iam_instance_profile   = aws_iam_instance_profile.s3_read_profile.name
+  vpc_security_group_ids = [aws_security_group.my_web.id]
+  subnet_id              = aws_subnet.eu-central-1a-private.id
+  associate_public_ip_address = true
+  key_name               = "jenkins"
+  tags = {
+    Name    = "linux"
+    Owner   = "Kozulenko Volodymyr"
+    Project = "Terraform AWS task6"
+  }
+}
 ```
 ### 17. While instanse runing, script does:
 user_data.sh
@@ -305,12 +394,12 @@ user_data.sh
 #!/bin/bash
 sudo yum update -y
 sudo amazon-linux-extras install -y nginx1
-sudo aws sync s3://fenixra-site /usr/share/nginx/html/
+sudo aws s3 sync s3://fenixra-site /usr/share/nginx/html/
 sudo chown nginx:nginx -R /usr/share/nginx/html/
 sudo systemctl enable nginx
 sudo systemctl start nginx
 ```
-### Results of "terraform apply"
+### Results of "terraform apply" and Ping check
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic1.png)   
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic2.png)   
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic3.png)     
@@ -323,7 +412,9 @@ sudo systemctl start nginx
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic10.png)     
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic11.png) 
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic12.png) 
-![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic13.png)     
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic13.png)  
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic14.png)
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task6-aws-terraform-v1/screenshot/pic15.png)   
     
 
 # terraform plan
