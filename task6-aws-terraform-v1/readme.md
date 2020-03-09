@@ -116,7 +116,7 @@ resource "aws_iam_policy_attachment" "attach_s3_read" {
 **8. Created subnet "eu-central-1a-public-second" cidr_block="192.168.1.0/24" in VPC  "Second"**      
 **9. Created IGW for VPC "Default" and IGW for  VPC "Second"**     
 **10. Attached IGW for each VPS**      
-**11. Created route tables for subnets "eu-central-1a-public" and "eu-central-1a-public-second"**     
+**11. Created route tables for subnets "eu-central-1a-public","eu-central-1a-private" and "eu-central-1a-public-second"**     
 **12. Assotiated route tables with both subnets.**     
 create_vpc_and_subnets.tf
 ```
@@ -240,6 +240,14 @@ resource "aws_route_table" "eu-central-1a-public-second" {
 resource "aws_route_table_association" "eu-central-1a-public-second" {
   subnet_id = aws_subnet.eu-central-1a-public-second.id
   route_table_id = aws_route_table.eu-central-1a-public-second.id
+}
+```
+### 13. Created peering connection between VPC "Default" and VPC  "Second"
+peering_connection.tf
+```
+resource "aws_vpc_peering_connection" "bridge" {
+  peer_vpc_id   = aws_vpc.default.id
+  vpc_id        = aws_vpc.second.id
 }
 ```
 ### 14. Created ACL and attach it to subnet "eu-central-1a-public"
