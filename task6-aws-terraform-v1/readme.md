@@ -44,7 +44,7 @@ Steps of solution:
    - Maked chown for user nginx /usr/share/nginx/html/*
    - enable nginx and start.
 18. Result - in subnet  "eu-central-1a-public" runing web server with a personal web site
-19. Ping to subnets (check avalaibility)
+19. Ping to subnets (check availability)
 
 ### 1. Created IAM policy "S3ReadOnly"
 create_iam_policy.tf
