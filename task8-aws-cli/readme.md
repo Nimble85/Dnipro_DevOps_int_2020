@@ -132,7 +132,7 @@ task8-testfile-policy.json
 
 ### 7. Create and use a role.
 
-Test-Role-Trust-Policy.json
+example-role-trust-policy.json
 ```
 {
     "Version": "2012-10-17",
