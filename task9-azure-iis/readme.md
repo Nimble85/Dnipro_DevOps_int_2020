@@ -337,6 +337,7 @@ Set-AzVMExtension `
   -SettingString $PublicSettings `
   -Location $location 
   ```
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task9-azure-iis/screenshot/pic8.png) 
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task9-azure-iis/screenshot/pic9.png) 
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task9-azure-iis/screenshot/pic10.png)
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task9-azure-iis/screenshot/pic11.png)
