@@ -296,7 +296,7 @@ file azuredeploy.json
 
 ## 3. create VM and change default page
 
-I make it via Cloud Shell
+I make it via Cloud Shell     
 file install.ps1
 ```
 # Variables for common values
