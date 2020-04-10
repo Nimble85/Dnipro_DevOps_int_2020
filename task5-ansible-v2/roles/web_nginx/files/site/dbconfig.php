@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /*
   Author : Mohamed Aimane Skhairi
   Email : skhairimedaimane@gmail.com
@@ -6,9 +6,9 @@
 */
 
 $DB_host = "192.168.0.220";
-$DB_user = "dppdo";
-$DB_pass = "dppdo";
-$DB_name = "dppdo";
+$DB_user = "dbpdo";
+$DB_pass = "dbpdo";
+$DB_name = "dbpdo";
 
 try
 {
