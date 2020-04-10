@@ -21,5 +21,3 @@ variable "user_name" {
   description = "aws ssh login user"
       default = "ec2-user"
 }
-          
-    
