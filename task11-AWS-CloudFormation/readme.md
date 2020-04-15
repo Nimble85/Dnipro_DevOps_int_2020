@@ -14,11 +14,11 @@ Acceptance Criteria:
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task11-AWS-CloudFormation/screenshot/pic1.png)
 
 
-# Deploy template yia awscli
+## Deploy template 
 
-### aws cloudformation deploy --template-file ./deploy-lamp.yaml --stack-name LAMP-Stack
+#### aws cloudformation deploy --template-file ./deploy-lamp.yaml --stack-name LAMP-Stack
 
-### cloudformation delete-stack --stack-name LAMP-Stack
+#### aws cloudformation delete-stack --stack-name LAMP-Stack
 
 
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task11-AWS-CloudFormation/screenshot/pic3.png)
