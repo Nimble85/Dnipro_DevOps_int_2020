@@ -1,13 +1,8 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  AWS CloudFormation Sample Template LAMP_Multi_AZ: Create a highly available,
-  scalable LAMP stack with an Amazon RDS database instance for the backend data
-  store. This template demonstrates using the AWS CloudFormation bootstrap
-  scripts to install the packages and files necessary to deploy the Apache web
-  server and PHP at instance launch time. **WARNING** This template creates one
-  or more Amazon EC2 instances, an Application Load Balancer and an Amazon RDS
-  DB instance. You will be billed for the AWS resources used if you create a
-  stack from this template.
+  AWS CloudFormation Sample Template LAMP Create a highly available,
+  scalable LAMP stack with an Amazon ec2 instance with mysql for the backend data
+  store.
 Parameters:
   Region:
     Type: String
@@ -498,23 +493,22 @@ Resources:
                                                     
                   - |2
                           
-                  - $DB_host   = "'
+                  - $DB_host   = "
                   - !GetAtt 
                     - MySQLDatabase
                     - PublicIp
                   - |
                     ";
-                  - '      $DB_user     = "'
+                  - $DB_user     = "
                   - !Ref DBUser
                   - |
                     ";
-                  - '      $DB_pass = "'
+                  - $DB_pass = "
                   - !Ref DBPassword
-                    
                   - |
                     ";
                   - |2    
-                         $DB_name = "dbpdo";
+                    $DB_name = "dbpdo";
                   - |2
                           try
                   - |2
@@ -584,13 +578,7 @@ Resources:
                   - /etc/cfn/cfn-hup.conf
                   - /etc/cfn/hooks.d/cfn-auto-reloader.conf
     Properties:
-      ImageId: !FindInMap 
-        - AWSRegionArch2AMI
-        - !Ref 'AWS::Region'
-        - !FindInMap 
-          - AWSInstanceType2Arch
-          - !Ref InstanceType
-          - Arch
+      ImageId: ami-076431be05aaf8080
       InstanceType: !Ref InstanceType
       SecurityGroups:
         - !Ref WebServerSecurityGroup
@@ -601,7 +589,7 @@ Resources:
           - - |
               #!/bin/bash -xe
             - |
-              yum update -y aws-cfn-bootstrap
+              yum update -y aws-cfn-bootstrap && wget -P /tmp/ https://task11.s3.eu-central-1.amazonaws.com/site.zip && sudo mkdir -p /var/www/html && sudo unzip /tmp/site.zip -d /var/www/html && sudo usermod -a -G apache ec2-user && sudo chown -R ec2-user:apache /var/www/
             - |
               # Install the files and packages from the metadata
             - '/opt/aws/bin/cfn-init -v '

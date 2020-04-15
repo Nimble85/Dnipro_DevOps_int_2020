@@ -159,131 +159,49 @@ Resources:
               php: []
               php-mysql: []
           files:
-            /var/www/html/index.php:
+            /var/www/html/dbconfig.php:
               content: !Join 
                 - ''
                 - - |
-                    <html>
+                    <?php
                   - |2
-                      <head>
+                                                    
                   - |2
-                        <title>AWS CloudFormation PHP Sample</title>
-                  - |2
-                        <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-                  - |2
-                      </head>
-                  - |2
-                      <body>
-                  - |2
-                        <h1>Welcome to the AWS CloudFormation PHP Sample</h1>
-                  - |2
-                        <p/>
-                  - |2
-                        <?php
-                  - |2
-                          // Print out the current data and tie
-                  - |2
-                          print "The Current Date and Time is: <br/>";
-                  - |2
-                          print date("g:i A l, F j Y.");
-                  - |2
-                        ?>
-                  - |2
-                        <p/>
-                  - |2
-                        <?php
-                  - |2
-                          // Setup a handle for CURL
-                  - |2
-                          $curl_handle=curl_init();
-                  - |2
-                          curl_setopt($curl_handle,CURLOPT_CONNECTTIMEOUT,2);
-                  - |2
-                          curl_setopt($curl_handle,CURLOPT_RETURNTRANSFER,1);
-                  - |2
-                          // Get the hostname of the intance from the instance metadata
-                  - |2
-                          curl_setopt($curl_handle,CURLOPT_URL,'http://169.254.169.254/latest/meta-data/public-hostname');
-                  - |2
-                          $hostname = curl_exec($curl_handle);
-                  - |2
-                          if (empty($hostname))
-                  - |2
-                          {
-                  - |2
-                            print "Sorry, for some reason, we got no hostname back <br />";
-                  - |2
-                          }
-                  - |2
-                          else
-                  - |2
-                          {
-                  - |2
-                            print "Server = " . $hostname . "<br />";
-                  - |2
-                          }
-                  - |2
-                          // Get the instance-id of the intance from the instance metadata
-                  - |2
-                          curl_setopt($curl_handle,CURLOPT_URL,'http://169.254.169.254/latest/meta-data/instance-id');
-                  - |2
-                          $instanceid = curl_exec($curl_handle);
-                  - |2
-                          if (empty($instanceid))
-                  - |2
-                          {
-                  - |2
-                            print "Sorry, for some reason, we got no instance id back <br />";
-                  - |2
-                          }
-                  - |2
-                          else
-                  - |2
-                          {
-                  - |2
-                            print "EC2 instance-id = " . $instanceid . "<br />";
-                  - |2
-                          }
-                  - '      $Database   = "'
+                          
+                  - $DB_host   = "'
                   - !GetAtt 
                     - MySQLDatabase
                     - PublicIp
                   - |
                     ";
-                  - '      $DBUser     = "'
+                  - '      $DB_user     = "'
                   - !Ref DBUser
                   - |
                     ";
-                  - '      $DBPassword = "'
+                  - '      $DB_pass = "'
                   - !Ref DBPassword
+                    
                   - |
                     ";
+                  - |2    
+                         $DB_name = "dbpdo";
                   - |2
-                          print "Database = " . $Database . "<br />";
+                          try
                   - |2
-                          $dbconnection = mysql_connect($Database, $DBUser, $DBPassword)
+                          {$DB_con = new PDO("mysql:host={$DB_host};dbname={$DB_name}",$DB_user,$DB_pass);
                   - |2
-                                          or die("Could not connect: " . mysql_error());
+                          $DB_con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                   - |2
-                          print ("Connected to $Database successfully");
+                          } catch(PDOException $e)
                   - |2
-                          mysql_close($dbconnection);
+                           { echo $e->getMessage();
                   - |2
-                        ?>
+                          }   include_once 'class.crud.php';
                   - |2
-                        <h2>PHP Information</h2>
-                  - |2
-                        <p/>
-                  - |2
-                        <?php
-                  - |2
-                          phpinfo();
-                  - |2
-                        ?>
-                  - |2
-                      </body>
+                          $crud = new crud($DB_con);
                   - |
-                    </html>
+                        ?>
+                  
               mode: '000600'
               owner: apache
               group: apache
@@ -342,9 +260,7 @@ Resources:
       SecurityGroups:
         - !Ref WebServerSecurityGroup
       KeyName: !Ref KeyName
-      Tags:
-        - Key: Name
-          Value: My-WEBSERVER
+      
       UserData: !Base64 
         'Fn::Join':
           - ''
@@ -353,6 +269,15 @@ Resources:
             - |
               yum update -y aws-cfn-bootstrap
             - |
+              yum install -y unzip
+            - |
+              wget -P /tmp/ https://task11.s3.eu-central-1.amazonaws.com/site.zip 
+            - |
+              unzip /tmp/site.zip -d /var/www/html
+            - |
+              usermod -a -G apache ec2-user
+              chown -R ec2-user:apache /var/www/
+            - |  
               # Install the files and packages from the metadata
             - '/opt/aws/bin/cfn-init -v '
             - '         --stack '
@@ -419,11 +344,10 @@ Resources:
           #!/bin/bash -ex
 
           sudo su
-
           yum install -y  mariadb-server
           systemctl enable mariadb
           systemctl start mariadb
-          wget https://github.com/fenixra73/Dnipro_DevOps_int_2020/blob/master/task11-AWS-CloudFormation/dbpdo.sql /tmp/dbpdo.sql
+          wget -P /tmp/ https://task11.s3.eu-central-1.amazonaws.com/dbpdo.sql 
           mysql -u root -e "CREATE DATABASE dbpdo;"
           mysql -u root -e "USE dbpdo;"
           mysql -u root -e "CREATE USER 'dbpdo'@'%' IDENTIFIED BY 'dbpdo';"
@@ -432,7 +356,7 @@ Resources:
           mysql -u root -e "GRANT ALL PRIVILEGES ON * . * TO 'dbpdo'@'%';"
           mysql -u root -e "GRANT ALL PRIVILEGES ON * . * TO 'dbpdo'@'localgost';"
           mysql -u root -e "FLUSH PRIVILEGES;"
-          mysql -u root  dbpdo< ~/dbpdo.sql;
+          mysql -u root  dbpdo< /tmp/dbpdo.sql;
       Tags:
         - Key: Name
           Value: My-DB
