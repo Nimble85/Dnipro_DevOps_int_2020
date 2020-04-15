@@ -23,7 +23,7 @@ Parameters:
   DbMasterPassword:
     Description: The database master password
     Type: String
-    Default: '((e?>2Z7:=[}Y{pR'
+    Default: ''
   VpcId:
     Type: 'AWS::EC2::VPC::Id'
     Default: vpc-9953a2f3
@@ -31,12 +31,17 @@ Parameters:
     ConstraintDescription: must be the VPC Id of an existing Virtual Private Cloud.
   Subnets:
     Type: 'List<AWS::EC2::Subnet::Id>'
-    Default:  subnet-1c2e3451, subnet-47cfd83a
+    Default:  'subnet-1c2e3451,subnet-47cfd83a'
+        
     Description: The list of SubnetIds in your Virtual Private Cloud (VPC)
     ConstraintDescription: >-
       must be a list of at least two existing subnets associated with at least
       two different availability zones. They should be residing in the selected
       Virtual Private Cloud.
+  DbSubnet:
+    Type: 'AWS::EC2::Subnet::Id'
+    Default: 'subnet-1c2e3451'
+
   KeyName:
     Default: jenkins
     Description: Name of an existing EC2 KeyPair to enable SSH access to the instances
@@ -87,71 +92,7 @@ Parameters:
     Default: 0.0.0.0/0
     AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
     ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
-Mappings:
-  AWSInstanceType2Arch:
-    t2.micro:
-      Arch: HVM64
-  AWSInstanceType2NATArch:
-    t2.micro:
-      Arch: NATHVM64
-  AWSRegionArch2AMI:
-    us-east-1:
-      HVM64: ami-0080e4c5bc078760e
-      HVMG2: ami-0aeb704d503081ea6
-    us-west-2:
-      HVM64: ami-01e24be29428c15b2
-      HVMG2: ami-0fe84a5b4563d8f27
-    us-west-1:
-      HVM64: ami-0ec6517f6edbf8044
-      HVMG2: ami-0a7fc72dc0e51aa77
-    eu-west-1:
-      HVM64: ami-08935252a36e25f85
-      HVMG2: ami-0d5299b1c6112c3c7
-    eu-west-2:
-      HVM64: ami-01419b804382064e4
-      HVMG2: NOT_SUPPORTED
-    eu-west-3:
-      HVM64: ami-0dd7e7ed60da8fb83
-      HVMG2: NOT_SUPPORTED
-    eu-central-1:
-      HVM64: ami-0cfbf4f6db41068ac
-      HVMG2: ami-0aa1822e3eb913a11
-    eu-north-1:
-      HVM64: ami-86fe70f8
-      HVMG2: ami-32d55b4c
-    ap-northeast-1:
-      HVM64: ami-00a5245b4816c38e6
-      HVMG2: ami-09d0e0e099ecabba2
-    ap-northeast-2:
-      HVM64: ami-00dc207f8ba6dc919
-      HVMG2: NOT_SUPPORTED
-    ap-northeast-3:
-      HVM64: ami-0b65f69a5c11f3522
-      HVMG2: NOT_SUPPORTED
-    ap-southeast-1:
-      HVM64: ami-05b3bcf7f311194b3
-      HVMG2: ami-0e46ce0d6a87dc979
-    ap-southeast-2:
-      HVM64: ami-02fd0b06f06d93dfc
-      HVMG2: ami-0c0ab057a101d8ff2
-    ap-south-1:
-      HVM64: ami-0ad42f4f66f6c1cc9
-      HVMG2: ami-0244c1d42815af84a
-    us-east-2:
-      HVM64: ami-0cd3dfa4e37921605
-      HVMG2: NOT_SUPPORTED
-    ca-central-1:
-      HVM64: ami-07423fb63ea0a0930
-      HVMG2: NOT_SUPPORTED
-    sa-east-1:
-      HVM64: ami-05145e0b28ad8e0b2
-      HVMG2: NOT_SUPPORTED
-    cn-north-1:
-      HVM64: ami-053617c9d818c1189
-      HVMG2: NOT_SUPPORTED
-    cn-northwest-1:
-      HVM64: ami-0f7937761741dc640
-      HVMG2: NOT_SUPPORTED
+
 Resources:
   ApplicationLoadBalancer:
     Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
@@ -396,13 +337,7 @@ Resources:
                   - /etc/cfn/cfn-hup.conf
                   - /etc/cfn/hooks.d/cfn-auto-reloader.conf
     Properties:
-      ImageId: !FindInMap 
-        - AWSRegionArch2AMI
-        - !Ref 'AWS::Region'
-        - !FindInMap 
-          - AWSInstanceType2Arch
-          - !Ref InstanceType
-          - Arch
+      ImageId: ami-0ec1ba09723e5bfac
       InstanceType: !Ref InstanceType
       SecurityGroups:
         - !Ref WebServerSecurityGroup
@@ -457,10 +392,14 @@ Resources:
     Properties:
       GroupDescription: Open database for access
       SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: '3306'
-          ToPort: '3306'
-          SourceSecurityGroupId: !Ref WebServerSecurityGroup
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
       VpcId: !Ref VpcId
   MySQLDatabase:
     Type: 'AWS::EC2::Instance'
@@ -470,21 +409,16 @@ Resources:
       InstanceType: t2.micro
       SecurityGroupIds:
         - !GetAtt DBEC2SecurityGroup.GroupId
-      Subnets: !Ref Subnets
+      SubnetId: !Ref DbSubnet
       UserData:
         'Fn::Base64': !Sub >
           #!/bin/bash -ex
 
           sudo su
 
-          yum localinstall -y
-          https://dev.mysql.com/get/mysql80-community-release-el7-1.noarch.rpm
-
-          yum install -y mysql-community-server
-
-          systemctl enable mysqld
-
-          systemctl start mysqld
+          yum install -y  mariadb-server
+          systemctl enable mariadb
+          systemctl start mariadb
 
           mysql -u root "-p$(grep -oP '(?<=root@localhost\: )\S+'
           /var/log/mysqld.log)" -e "ALTER USER 'root'@'localhost' IDENTIFIED BY
@@ -499,7 +433,7 @@ Resources:
           mysql -u root "-p${DbMasterPassword}" -e "FLUSH PRIVILEGES"
       Tags:
         - Key: Name
-          Value: AWSJS-DB
+          Value: My-DB
 Outputs:
   WebsiteURL:
     Description: URL for newly created LAMP stack
