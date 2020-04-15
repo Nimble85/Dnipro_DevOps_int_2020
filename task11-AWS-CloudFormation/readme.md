@@ -20,6 +20,10 @@ Acceptance Criteria:
 
 #### aws cloudformation delete-stack --stack-name LAMP-Stack
 
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task11-AWS-CloudFormation/screenshot/pic2.png)
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task11-AWS-CloudFormation/screenshot/pic2-2.png)
+![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task11-AWS-CloudFormation/screenshot/pic2-2-2.png)
+
 
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task11-AWS-CloudFormation/screenshot/pic3.png)
 ![](https://github.com/fenixra73/Dnipro_DevOps_int_2020/raw/master/task11-AWS-CloudFormation/screenshot/pic4.png)
