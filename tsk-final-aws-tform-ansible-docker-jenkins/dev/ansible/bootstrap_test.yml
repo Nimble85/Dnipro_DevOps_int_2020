@@ -1,0 +1,12 @@
+---
+
+- name: apply roles for Test host
+  hosts: test
+  become: yes
+  user: "{{ user }}"
+
+  roles:
+    - jenkins_slave
+    
+
+

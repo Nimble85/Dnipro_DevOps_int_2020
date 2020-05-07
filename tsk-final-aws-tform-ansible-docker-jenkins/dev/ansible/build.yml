@@ -1,0 +1,11 @@
+---
+- hosts: dev
+  remote_user: ubuntu
+  tasks:
+    - name: Install intermine
+      shell: "cd /home/ubuntu/intermine/testmine  && ./setup.sh"
+
+#    - name: start intermine
+#      shell: "cd /home/ubuntu/intermine/testmine  && ./gradlew tomcatstartwar --no-daemon &"
+
+

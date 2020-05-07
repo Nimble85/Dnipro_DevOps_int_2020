@@ -1,0 +1,8 @@
+- name: Ensure jenkins_slave directory on slave hosts
+  file:
+    state: directory
+    path : /home/ubuntu/jenkins_slave
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
+

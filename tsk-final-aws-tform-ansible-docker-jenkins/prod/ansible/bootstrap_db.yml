@@ -1,0 +1,14 @@
+---
+
+- name  : apply roles for DB_DEV host 
+  hosts : dev
+  become: yes
+  user  : "{{ user }}"
+
+  roles :
+    - jenkins_slave
+
+
+
+
+

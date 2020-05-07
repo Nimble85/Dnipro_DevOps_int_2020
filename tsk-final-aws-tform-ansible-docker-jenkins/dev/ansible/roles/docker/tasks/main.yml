@@ -1,0 +1,124 @@
+---
+- name: Update all packages
+  apt:
+    name: "*"
+    state: latest
+    update_cache: yes
+
+
+#- name: check linux distro
+#  debug: var=ansible_os_family
+
+- name: Install aptitude using apt
+  apt: name=aptitude state=latest update_cache=no force_apt_get=yes
+  ignore_errors: yes
+
+- name: Install required system packages
+
+  apt: name={{ item }} state=latest update_cache=no
+  loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
+  ignore_errors: yes
+
+- name: Add Docker GPG apt Key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add Docker Repository
+  apt_repository:
+    repo: deb https://download.docker.com/linux/ubuntu bionic stable
+    state: present
+
+- name: Update apt and install docker-ce
+  apt: update_cache=no name=docker-ce state=latest
+
+- name: Install Docker Module for Python
+  pip:
+    name: docker
+
+- name: Ensure jenkins directory on docker host
+  file:
+    state: directory
+    path: /share/jenkins_home
+
+#- name: Simple GET fom S3 operation
+#  aws_s3:
+#    bucket: fenixra73.backup
+#    object: /archive-jenkins.tar.gz
+#    dest  : /tmp/archive-jenkins.tar.gz
+#    mode  : get
+
+#- name: copy from S3 bucet jencins archive
+#  shell: "aws s3 cp s3://fenixra73.backup/archive-jenkins.tar.gz /tmp/archive-jenkins.tar.gz && tar -zxvf  /tmp/archive-jenkins.tar.gz -C /share/jenkins_home --exclude=ssh-host-key.xml"
+
+- name: copy xml config prod_slave
+  copy:
+    src:  db_prod/config.xml
+    dest: /share/jenkins_home/nodes/prod_slave/config.xml
+
+    
+- name: copy xml config slave_test
+  copy:
+    src:  slave_test/config.xml.test
+    dest: /share/jenkins_home/nodes/slave_test/config.xml
+
+
+- name: copy xml config slave_db_dev
+  copy: 
+    src:  db/config.xml
+    dest: /share/jenkins_home/nodes/slave_db_dev/config.xml
+
+- name: Pull the latest official jenkins docker image
+  docker_image:
+    name: "jenkinsci/blueocean"
+
+- name: Ensure Jenkins server started
+  docker_container:
+    name: "jenkins-server"
+    image: "jenkinsci/blueocean"
+    state: started
+    restart: yes
+    user: root
+    volumes:
+      - "/share/jenkins_home:/var/jenkins_home"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    ports:
+      - "8081:8080"
+      - "50000:50000"
+
+- name: Copy systemd service script to start and stop the jenkins container
+  copy: src=../../files/jenkins.service dest=/etc/systemd/system
+
+
+- name:  Reload systemctl
+  systemd:
+    name         : jenkins
+    state        : restarted
+    daemon_reload: yes
+    enabled      : yes
+
+
+#- name: Reload systemctl
+#  shell: "systemctl reload-or-restart jenkins"
+
+#- name: Enable the jenkins service
+#  shell: "systemctl enable jenkins"
+
+- name: check docker
+  shell: "docker version"
+  register: docker_info
+- debug:
+    var: docker_info
+
+- name: check runing container jenkins
+  shell: "docker ps -a"
+  register: jenkins_status
+- debug:
+    var: jenkins_status
+
+- name: check opened ports
+  shell: "netstat -ltpn"
+  register: open_ports
+- debug:
+    var: open_ports 
+

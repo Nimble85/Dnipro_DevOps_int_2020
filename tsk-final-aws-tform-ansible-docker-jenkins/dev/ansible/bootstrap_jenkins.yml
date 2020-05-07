@@ -1,0 +1,15 @@
+---
+  
+- name  : apply roles for host with "jenkins in docker"
+  hosts : jenkins
+  become: yes
+  user  : "{{ user }}"
+  
+  roles:
+    - docker
+
+
+
+
+  
+

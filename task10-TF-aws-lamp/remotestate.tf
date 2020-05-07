@@ -2,10 +2,10 @@
 terraform {
  backend "s3" {
  encrypt = true
- bucket = var.s3_bucket_name
- dynamodb_table = var.remotetf
- region = var.region_run
- key = var.key_for_lock_table
+ bucket = "diplom.tfstate"
+ dynamodb_table = "remotetf"
+ region = "eu-central-1"
+ key = "terraform-lamp.tfstate"
  }
  
 }

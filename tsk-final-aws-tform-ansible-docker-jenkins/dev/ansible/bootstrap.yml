@@ -1,0 +1,218 @@
+---
+- hosts: dev
+  become: yes
+  remote_user: ubuntu
+  tasks:
+    - name: Update all packages
+      apt:
+        name: "*"
+        state: latest
+        update_cache: yes
+
+    - name: Install Software
+      apt:
+        name:
+          - awscli
+          - git
+          - openjdk-8-jdk
+          - openjdk-8-jre-headless
+          - htop
+          - screen
+          - mc
+          - maven
+          - libxml-writer-perl
+          - libxml-sax-base-perl
+          - libxml-perl
+          - libxml-filter-saxt-perl
+          - libtext-glob-perl
+          - postgresql
+
+############ postgres ###########
+    - name: configure posttgres
+      shell: |
+        cat << EOF > /tmp/pg_hba.conf
+        local   all             all                                     trust
+        host    all             all             all                     trust
+        host    all             all             127.0.0.1/32            trust
+        host    all             all             ::1/128                 trust
+        host    all             all             0.0.0.0/0              password
+        EOF
+        mv /tmp/pg_hba.conf /etc/postgresql/10/main/pg_hba.conf
+        sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/g" /etc/postgresql/10/main/postgresql.conf
+        PSQL_USER=ubuntu
+        PSQL_PWD=ubuntu
+        su postgres -c "psql -c \"CREATE ROLE $PSQL_USER SUPERUSER CREATEDB CREATEROLE INHERIT LOGIN ENCRYPTED PASSWORD '$PSQL_PWD'\";"
+      ignore_errors: yes
+
+    - name: start psql
+      service:
+        name: postgresql
+        enabled: yes
+        state: started
+
+###### begin section install docker
+
+    - name: Install aptitude using apt
+      apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
+
+    - name: Install required system packages
+      apt: name={{ item }} state=latest update_cache=yes
+      loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
+
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu bionic stable
+        state: present
+
+    - name: Update apt and install docker-ce
+      apt: update_cache=yes name=docker-ce state=latest
+
+    - name: Install Docker Module for Python
+      pip:
+        name: docker
+####### end section install docker ########
+
+######### prepare jenkins_home #########
+
+#    - name: Ensure jenkins directory on docker host
+#      file:
+#        state: directory
+#        path: /share/jenkins_home
+
+    - name: Simple GET fom S3 operation
+      aws_s3:
+        bucket: fenixra73.backup
+        object: /archive-jenkins.tar.gz 
+        dest: /tmp/archive-jenkins.tar.gz 
+        mode: get
+
+    - name: copy from S3 bucet jencins archive
+      shell: "aws s3 cp s3://fenixra73.backup/archive-jenkins.tar.gz /tmp/archive-jenkins.tar.gz && tar -zxvf  /tmp/archive-jenkins.tar.gz -C /share/jenkins_home"
+
+
+    - name: Pull the latest official jenkins docker image
+      docker_image:
+        name: "jenkinsci/blueocean"
+#        name: "jenkins:latest"
+
+    - name: Ensure Jenkins server started
+      docker_container:
+        name: "jenkins-server"
+#        image: "jenkins:latest"
+        image: "jenkinsci/blueocean"
+        state: started
+        restart: yes
+        user: root
+        volumes:
+          - "/share/jenkins_home:/var/jenkins_home"
+          - "/var/run/docker.sock:/var/run/docker.sock"
+        ports:
+          - "8081:8080"
+          - "50000:50000"
+
+
+##### this section moved in to file #########
+#    - name: Doing  jenkins as service
+#      shell: |
+#        sudo cat << EOF > /tmp/jenkins.service
+#        [Unit]
+#        Description=Jenkins in a Docker container
+#        Requires=docker.service
+#        After=docker.service
+#
+#        [Service]
+#        Restart=always
+#        ExecStart=/usr/bin/docker start -a jenkins-server
+#        ExecStop=/usr/bin/docker stop -t 2 jenkins-server
+#
+#        [Install]
+#        WantedBy=default.target
+#        EOF
+#        mv /tmp/jenkins.service /etc/systemd/system/jenkins.service
+
+    - name: Copy systemd service script to start and stop the jenkins container
+      copy: src=../../files/jenkins.service dest=/etc/systemd/system
+
+    - name: Reload systemctl
+      shell: "systemctl reload-or-restart jenkins"
+
+    - name: Enable the jenkins service
+      shell: "systemctl enable jenkins"
+
+    - name: check docker
+      shell: "docker version"
+      register: docker_info
+    - debug:
+        var: docker_info
+
+    - name: check runing container jenkins
+      shell: "docker ps -a"
+      register: jenkins_status
+    - debug:
+        var: jenkins_status
+
+######## end section jenkins ############
+
+#   - name: install tomcat
+#     shell: |
+#       wget "https://apache.volia.net/tomcat/tomcat-9/v9.0.34/bin/apache-tomcat-9.0.34.tar.gz" -O apache-tomcat.tar.gz
+#       mkdir /home/ubuntu/tomcat/ -p
+#       tar -zxf apache-tomcat.tar.gz -C /home/ubuntu/tomcat/ --strip-components=1
+
+#  - name: solr instal
+#    shell: |
+#      wget http://archive.apache.org/dist/lucene/solr/7.2.1/solr-7.2.1.tgz
+#      tar xzf solr-7.2.1.tgz solr-7.2.1/bin/install_solr_service.sh --strip-components=2
+#      bash ./install_solr_service.sh solr-7.2.1.tgz
+#      systemctl enable solr
+#    args:
+#      executable: /bin/bash        
+
+
+############# begin section check status installed software #####
+    - name: check Java
+      shell: "java -version"
+      register: java_ver
+    - debug:
+        var: java_ver
+
+    - name: check maven
+      shell: "mvn -version"
+      register: mvn_info
+    - debug:
+        var: mvn_info
+############# end section check status installed software #####
+
+    - name: Clone git repo
+      git:
+#        repo: https://github.com/intermine/intermine.git
+        repo: https://github.com/fenixra73/intermine.git
+        dest: /home/ubuntu/intermine
+        update: no
+
+    - name: Chown
+      file:
+        path: /home/ubuntu/
+        owner: ubuntu
+        group: ubuntu
+        recurse: yes
+
+    - name: Install intermine
+      become: yes
+      become_user: ubuntu
+      shell: |
+        cd /home/ubuntu/intermine/testmine  
+        /home/ubuntu/intarmine/testmine/setup.sh  
+
+#    - name: try start intermine
+#    #      become: yes
+#    #      become_user: ubuntu
+#    #      shell: "screen /home/ubuntu/intermine/testmine/gradlew tomcatstartwar --no-daemon &"
+  
+  
+
