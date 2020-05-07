@@ -10,6 +10,8 @@ variable   "region_run"                         {}
 variable   "size_instance"                      { description = "size instance"  }
 variable   "keypair_project"                    {  description = "aws keypair name"    }
 variable   "user_name"                          { description = "aws ssh login user" }
+variable   "env_name_node_jenkins"              {}
+variable   "env_label_slave_jenkins"            {}
               
 
 
@@ -32,6 +34,9 @@ module "db" {
   size_instance_dev               = var.size_instance
   subnet_id_instance              = module.vpc.subnet_id_public1
   role                            = module.s3_prod.aws_iam_instance_profile_s3_read_profile_db_prod_name    
+  name_node_jenkins               = var.env_name_node_jenkins
+  label_slave_jenkins             = var.env_label_slave_jenkins
+
 }
 
 module "s3_prod"  {

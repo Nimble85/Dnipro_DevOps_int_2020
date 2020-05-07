@@ -36,6 +36,11 @@
   pip:
     name: docker
 
+- name: nstall PyGithub
+  pip:
+    name: PyGithub
+
+
 - name: Ensure jenkins directory on docker host
   file:
     state: directory
@@ -48,8 +53,8 @@
 #    dest  : /tmp/archive-jenkins.tar.gz
 #    mode  : get
 
-#- name: copy from S3 bucet jencins archive
-#  shell: "aws s3 cp s3://fenixra73.backup/archive-jenkins.tar.gz /tmp/archive-jenkins.tar.gz && tar -zxvf  /tmp/archive-jenkins.tar.gz -C /share/jenkins_home --exclude=ssh-host-key.xml"
+- name: copy from S3 bucet jencins archive
+  shell: "aws s3 cp s3://fenixra73.backup/archive-jenkins.tar.gz /tmp/archive-jenkins.tar.gz && tar -zxvf  /tmp/archive-jenkins.tar.gz -C /share/jenkins_home --exclude=ssh-host-key.xml"
 
 - name: copy xml config prod_slave
   copy:
@@ -96,6 +101,18 @@
     state        : restarted
     daemon_reload: yes
     enabled      : yes
+-
+
+- name:  create a new webhook that triggers on push
+  github_webhook:
+    repository  : fenixra73/intermine
+    url         : http://{{ ip_jenkins }}:8081/generic-webhook-trigger/invoke?token=intermine
+    content_type: json
+    user        : "{{ user_github }}"
+    password    : "{{ pass_github }}"
+    events      :
+    - push
+
 
 
 #- name: Reload systemctl

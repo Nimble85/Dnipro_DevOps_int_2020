@@ -95,12 +95,13 @@ ${aws_instance.jenkins.public_ip}
 EOF
 EOD
   }
-#  provisioner "local-exec" {
-#    command = <<EOF
-#    aws ec2 wait instance-status-ok --instance-ids ${aws_instance.jenkins.id} --profile default
-#    
-#  EOF
-#  }
+  provisioner "local-exec" {
+    command = <<EOD
+cat <<EOF > ip_jenkins
+${aws_instance.jenkins.public_ip}
+EOF
+EOD
+  }
 
 #  provisioner "local-exec" {
 #    command = <<EOF

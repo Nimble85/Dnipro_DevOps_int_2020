@@ -1,0 +1,71 @@
+#!groovy
+// Run intermine build
+properties([disableConcurrentBuilds()])
+
+pipeline {
+    agent { 
+        label 'db_dev'
+
+        }
+    environment { 
+        BUILD_NO       = 'v1.0'
+        HOST           = 'http://54.93.59.90:8080/intermine-demo/'
+        TEST1          = '/intermine-demo/begin.do'         
+        
+    }
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '2', artifactNumToKeepStr: '2'))
+        timestamps()
+    }
+  
+    stages {
+        stage("build intermine app") {
+            steps {
+                echo "===============build intermine app======================="
+                dir ("testmine") {
+                sh '''
+                  ./setup.sh > ~/log_setup  2>&1 < /dev/null &
+                  sleep 600
+                  '''
+                }
+            }
+        }   
+        stage("check runing  ") {
+            steps {
+                echo "===============check runining intermine======================="
+                dir ("intermine/testmine") {
+                
+                sh '''
+                   curl -I $HOST | grep -o $TEST1
+                   '''
+                   echo "===============check runining passed=======================" 
+                }                 
+            }    
+        }
+        stage("approve") {
+            steps {
+                echo "===============wait approve======================="
+                  input 'Ready to go?'; 
+            }
+        }
+        stage("deploy to Prod_db") {
+            steps {
+                build job: 'deploy_prod', propagate: true, wait: true
+            }
+        }
+           
+        
+    }    
+             
+    
+       
+    post { 
+        failure { 
+            echo "==============some gone wrong !!!==============="
+            
+        }
+    }
+    
+  
+}
+

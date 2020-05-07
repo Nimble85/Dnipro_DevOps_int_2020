@@ -1,0 +1,63 @@
+variable  "all_env_region"  {}
+
+provider "aws" {
+  region             = var.all_env_region
+  
+}
+
+module "dev" {
+
+  source                  = "./dev"
+  aws_profile             = "default"
+  region_run              = var.all_env_region
+  keypair_project         = "jenkins"
+  size_instance           = "t2.micro"
+  user_name               = "ubuntu"
+  vpc_cidr                = "10.0.0.0/16"
+  cidrs_project           = {
+                             public1  = "10.0.1.0/24"
+                             public2  = "10.0.2.0/24"
+                             private1 = "10.0.3.0/24"
+                             private2 = "10.0.4.0/24"
+                             } 
+  public_key_path         = "~/.ssh/jenkins.pem"
+  env_project             = "dev"
+  ami_project             = "ami-0e342d72b12109f91" # ubuntu 18.04
+  env_label_slave_jenkins = "db_dev"
+  env_name_node_jenkins   = "slave_db_dev"
+
+
+}
+
+module "prod" {
+  source                  = "./prod"
+  aws_profile             = "default"
+  region_run              = var.all_env_region
+  keypair_project         = "jenkins"
+  size_instance           = "t2.micro"
+  user_name               = "ubuntu"
+  vpc_cidr                = "192.168.0.0/16"
+  cidrs_project           = {
+                             public1  = "192.168.1.0/24"
+                             public2  = "192.168.2.0/24"
+                             private1 = "192.168.3.0/24"
+                             private2 = "192.168.4.0/24"
+                            }
+  env_label_slave_jenkins = "prod_db"
+  env_name_node_jenkins   = "prod_slave"
+  public_key_path         = "~/.ssh/jenkins.pem"
+  env_project             = "prod"
+  ami_project             = "ami-0e342d72b12109f91" # ubuntu 18.04
+
+
+}             
+
+terraform {
+  backend "s3" {
+  encrypt = true
+  bucket = "diplom.tfstate"
+  dynamodb_table = "remotetf"
+  region = "eu-central-1"
+  key = "terraform-all.tfstate"
+       }
+}

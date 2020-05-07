@@ -34,8 +34,9 @@ module "db" {
   size_instance_dev               = var.size_instance
   subnet_id_instance              = module.vpc.subnet_id_public1
   role                            = module.s3.aws_iam_instance_profile_s3_read_profile_db_dev_name    
-#  depends_on                      = [module.test.aws_instance_jenkins]
-#  jenkins_instance                = module.test.aws_instance_jenkins
+  name_node_jenkins               = var.env_name_node_jenkins
+  label_slave_jenkins             = var.env_label_slave_jenkins
+
 }
 
 module "test" {
@@ -48,8 +49,7 @@ module "test" {
   size_instance_dev               = var.size_instance
   subnet_id_instance              = module.vpc.subnet_id_public1
   role                            = module.s3.aws_iam_instance_profile_s3_read_profile_db_dev_name
-  name_node_jenkins               = var.env_name_node_jenkins
-  label_slave_jenkins             = var.env_label_slave_jenkins
+  
 }
 
 module "s3"  {
