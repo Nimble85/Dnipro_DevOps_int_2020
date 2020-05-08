@@ -5,7 +5,7 @@ variable "vpc_security_group_ids_instance" {}
 variable "subnet_id"                       {}
 variable "env_instance"                    {}
 variable "subnet_id_instance"              {}
-variable  "role"                            {}
+variable  "role"                           {}
 
 resource "aws_instance" "test" {
   ami                         = var.ami

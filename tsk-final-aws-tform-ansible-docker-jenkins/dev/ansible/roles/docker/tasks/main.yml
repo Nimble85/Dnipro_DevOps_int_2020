@@ -58,19 +58,19 @@
 
 - name: copy xml config prod_slave
   copy:
-    src:  db_prod/config.xml
+    src :  db_prod/config.xml
     dest: /share/jenkins_home/nodes/prod_slave/config.xml
 
     
 - name: copy xml config slave_test
   copy:
-    src:  slave_test/config.xml.test
+    src :  slave_test/config.xml.test
     dest: /share/jenkins_home/nodes/slave_test/config.xml
 
 
 - name: copy xml config slave_db_dev
   copy: 
-    src:  db/config.xml
+    src :  db/config.xml
     dest: /share/jenkins_home/nodes/slave_db_dev/config.xml
 
 - name: Pull the latest official jenkins docker image
@@ -79,11 +79,11 @@
 
 - name: Ensure Jenkins server started
   docker_container:
-    name: "jenkins-server"
-    image: "jenkinsci/blueocean"
-    state: started
+    name   : "jenkins-server"
+    image  : "jenkinsci/blueocean"
+    state  : started
     restart: yes
-    user: root
+    user   : root
     volumes:
       - "/share/jenkins_home:/var/jenkins_home"
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -121,7 +121,7 @@
 #- name: Enable the jenkins service
 #  shell: "systemctl enable jenkins"
 
-- name: check docker
+- name : check docker
   shell: "docker version"
   register: docker_info
 - debug:
